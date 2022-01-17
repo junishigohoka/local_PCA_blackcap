@@ -91,15 +91,15 @@ Rscript $dirscripts/getOutliers.R --input $dirlocalpcamds/local_PCA_MDS_3_chromo
 
 ```
 
-Plot
+Make Manhattan plots.
 ```bash
 Rscript $dirscripts/plot_local_PCA_MDS_manhattan.R --input $dirlocalpcamds/local_PCA_MDS_3_chromosomes.txt --thre $dirlocalpcamds/local_PCA_MDS_3_chromosomesthreshold.txt --bed $dirlocalpcamds/local_PCA_MDS_outlier.bed --output $dirlocalpcamds/local_PCA_MDS --chrlist $dirlist/chromosomes_length.list
 
 ```
 
-![](local_PCA/output/local_PCA_MDS/local_PCA_MDS_3_chromosomes_MDS1_outliers.png)
+![](local_PCA/output/local_PCA_MDS/local_PCA_MDS_MDS1_outliers.png)
 
-![](local_PCA/output/local_PCA_MDS/local_PCA_MDS_3_chromosomes_MDS2_outliers.png)
+![](local_PCA/output/local_PCA_MDS/local_PCA_MDS_MDS2_outliers.png)
 
 
 
