@@ -164,9 +164,38 @@ done < $dirlist/local_PCA_MDS_outlier.bed
 Plot PCA results.
 ```bash
 
-Rscript $dirscripts/plot_pca_per_outlier.R --dirpca $dirout --poplist $dirlist/id_spp_pop_site_pheno.tsv --svlist $dirlist/local_PCA_MDS_outlier.bed --chrlist $dirlist/chromosomes.list
+Rscript $dirscripts/plot_pca_per_outlier.R --dirpca $dirout --poplist $dirlist/id_spp_pop_site_pheno.tsv --outlierlist $dirlist/local_PCA_MDS_outlier.bed --chrlist $dirlist/chromosomes.list
 
 ```
 
 ![](PCA/output/PCA_localPCA_outlier.png)
+
+
+
+Get Eigenvalues.
+
+```bash
+
+while read chr pos1 pos2
+do
+        awk -v chr=$chr -v pos1=$pos1 -v pos2=$pos2 'BEGIN{printf "%s %s %s ", chr,pos1,pos2}{printf "%s ",$1}END{print ""}' $dirout/${chr}_${pos1}_${pos2}.eigenval
+done < $dirlist/local_PCA_MDS_outlier.bed | awk 'NR==1{printf "%s %s %s ","chr","pos1","pos2";for(i=4;i<=NF;i++){printf "%s ","PC"i-3};print ""}{print $0}'> $dirout/eigenvalues.txt
+
+
+```
+
+Plot Eigenvalues.
+
+```bash
+
+Rscript $dirscripts/plot_eigenval.R --dirpca $dirout 
+
+```
+
+![](PCA/output/eigenval.png)
+
+
+
+
+
 

@@ -1,4 +1,4 @@
-#This script is written to visualise the results of PCA per SV by PLINK
+options <- commandArgs(trailingOnly = TRUE)
 library("optparse")
  
 option_list = list(
