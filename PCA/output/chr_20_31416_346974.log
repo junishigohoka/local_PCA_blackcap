@@ -1,0 +1,48 @@
+PLINK v1.90b4 64-bit (20 Mar 2017)
+Options in effect:
+  --allow-extra-chr
+  --allow-no-sex
+  --double-id
+  --geno 0.9
+  --maf 0.01
+  --out /home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974
+  --pca var-wts
+  --vcf /home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/input/vcf/chr_20_31416_346974.vcf.gz
+
+Hostname: node12
+Working directory: /home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline
+Start time: Mon Jan 17 21:29:12 2022
+
+Random number seed: 1642451352
+515898 MB RAM detected; reserving 257949 MB for main workspace.
+--vcf:
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974-temporary.bed
++
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974-temporary.bim
++
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974-temporary.fam
+written.
+17999 variants loaded from .bim file.
+179 people (0 males, 0 females, 179 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974.nosex
+.
+Using up to 31 threads (change this with --threads).
+Before main variant filters, 179 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.999046.
+0 variants removed due to missing genotype data (--geno).
+17105 variants removed due to minor allele threshold(s)
+(--maf/--max-maf/--mac/--max-mac).
+894 variants and 179 people pass filters and QC.
+Note: No phenotypes present.
+Relationship matrix calculation complete.
+--pca: Results saved to
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974.eigenval
+,
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974.eigenvec
+, and
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/PCA/output/chr_20_31416_346974.eigenvec.var
+.
+
+End time: Mon Jan 17 21:29:12 2022
