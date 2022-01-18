@@ -450,7 +450,7 @@ Rscript $dirscripts/plot_tmrca.R --dirlist $dirlist --dirout $dirout
 
 ```
 
-![text](class-1/output/chr_12.tmrca.pdf)
+![text](class-1/output/chr_12.tmrca.png)
 
 
 

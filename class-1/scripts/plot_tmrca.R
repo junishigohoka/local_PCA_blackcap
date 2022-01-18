@@ -39,7 +39,8 @@ colnames(stats) <- c("prefix","interval","KW","MW_AA_AB","MW_BB_AB")
 
 
 setwd(dirout)
-pdf("chr_12.tmrca.pdf",width=3.5*5,height=3.5*nrow(prefixlist))
+#pdf("chr_12.tmrca.pdf",width=3.5*5,height=3.5*nrow(prefixlist))
+png("chr_12.tmrca.png",width=480*5,height=480*nrow(prefixlist), res=350)
 m<-2.5
 par(mfrow=c(nrow(prefixlist),5),
     las=1
