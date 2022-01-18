@@ -354,14 +354,14 @@ done<$dirlist/class-1.chr_12.bed | awk 'BEGIN{print "chr","pos.from","pos.to","p
 
 ```
 
-The result is written in `class-1/output/permutation_windowstats_class1.csv`.
+The result is written in [`class-1/output/permutation_windowstats_class1.csv`](class-1/output/permutation_windowstats_class1.csv).
 
 
 
 
 ### Coalescent time (empirical)
 
-Samples used for coalescent time analysis are listed in `class-1/list/chr_12.AA.4samples.list`, `class-1/list/chr_12.AB.4samples.list` and `class-1/list/chr_12.BB.4samples.list`.
+Samples used for coalescent time analysis are listed in [`class-1/list/chr_12.AA.4samples.list`](class-1/list/chr_12.AA.4samples.list), [`class-1/list/chr_12.AB.4samples.list`](class-1/list/chr_12.AB.4samples.list) and [`class-1/list/chr_12.BB.4samples.list`](class-1/list/chr_12.BB.4samples.list).
 
 
 Mask files were created using `generate_multihetsep.py` following <https://github.com/stschiff/msmc-tools> from alignment files (BAM) and reference file (FASTA).
