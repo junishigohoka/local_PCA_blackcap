@@ -488,6 +488,6 @@ Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 
 ```
 
-![](class-1/output/chr_12.rec.10kb.png)
+![](class-1/output/rec_rate_class-1.png)
 
 
