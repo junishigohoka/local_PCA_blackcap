@@ -279,8 +279,8 @@ Rscript $dirscripts/plot_het.R --dir $dirout
 
 ### F<sub>ST</sub>, d<sub>XY</sub> and π
 
-
-
+$F_{ST}$
+$\pi$
 
 
 
