@@ -207,7 +207,7 @@ Rscript $dirscripts/plot_eigenval.R --dirpca $dirout
 
 
 
-## Class-1 genomic islands
+## Class-1 genomic islands (empirical)
 
 ```bash
 
@@ -459,7 +459,7 @@ Rscript $dirscripts/plot_tmrca.R --dirlist $dirlist --dirout $dirout
 Recombination rate was inferred by Karen Bascón-Cardozo using [`pyrho`](https://github.com/popgenmethods/pyrho).
 Raw output of `Pyrho` are [`chr_12.AA.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.AA.maf10_biall_W50_p20.rmap), [`chr_12.AB.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.AB.maf10_biall_W50_p20.rmap), [`chr_12.BB.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.BB.maf10_biall_W50_p20.rmap).
 
-Calculate 10-kb mean recombination rate using [`PyrhoWindowMean.R`](class-1/scripts/PyrhoWindowMena.R).
+Calculate 10-kb mean recombination rate using [`PyrhoWindowMean.R`](class-1/scripts/PyrhoWindowMean.R).
 
 ```bash
 chr=chr_12
@@ -489,5 +489,12 @@ Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 ```
 
 ![](class-1/output/rec_rate_class-1.png)
+
+
+
+## Class-1 genomic islands (simulation)
+
+
+
 
 
