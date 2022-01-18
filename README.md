@@ -215,6 +215,7 @@ dirbase=$PWD/class-1
 dirin=$dirbase/input
 dirvcf=$dirin/vcf
 dirmask=$dirin/mask
+dirmultihetsep=$dirin/multihetsep
 dirlist=$dirbase/list
 dirout=$dirbase/output
 dirscripts=$dirbase/scripts
@@ -391,6 +392,17 @@ $dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
 
 ```
 
+
+Submit them to make `class-1/scripts/input/multihetsep/` files.
+
+```bash
+
+for geno in AA AB BB
+do
+        sbatch $dirscripts/run_generate_multihetsep/run_generate_multihetsep_chr_12.$geno.sh $dirmask $dirvcf $dirmultihetsep
+done
+
+```
 
 
 
