@@ -8,20 +8,13 @@ option_list = list(
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
-#input<-opt$input
-#poplist<-opt$poplist
-#outlierlist<-read.table(opt$outlierlist,col.names = c("chr","from","to"))
-#chrlist<-read.table(opt$chrlist,col.names="chr")
-#chrlist$index<-1:nrow(chrlist)
 dirpca<-opt$dirpca
 
 
 
 
 library("RColorBrewer")
-#library("viridis")
 cols<-c(brewer.pal(7,"Set2")[1:3])
-#cols<-viridis_pal(option="D",direction=-1)(3)
 
 
 setwd(dirpca)

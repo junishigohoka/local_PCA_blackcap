@@ -207,6 +207,76 @@ Rscript $dirscripts/plot_eigenval.R --dirpca $dirout
 
 
 
+## Class-1 genomic islands
+
+```bash
+
+dirbase=$PWD/class-1
+dirin=$dirbase/input
+dirvcf=$dirin/vcf
+dirlist=$dirbase/list
+dirout=$dirbase/output
+dirscripts=$dirbase/scripts
+
+```
+
+### Heterozygosity
+
+
+Make link to VCF of chromosome 12, as an example chromosome harbouring a class-1 genomic island.
+```bash
+ln $dirbase/../PCA/input/vcf/chr_12.vcf.gz  $dirvcf
+ln $dirbase/../PCA/input/vcf/chr_12.vcf.gz.csi  $dirvcf
+
+```
+
+Get coordinates of class-1 genomic island of chromosome 12.
+
+```bash
+
+awk -v OFS="\t" '$1=="chr_12"{$1=$1;print $0}' $dirbase/../local_PCA/output/local_PCA_MDS/local_PCA_MDS_outlier.bed > $dirlist/class-1.chr_12.bed
+
+```
+
+Make list of individuals with AA, AB, and BB. 
+
+```bash
+
+awk '$3<0{print $1}' $dirbase/../PCA/output/chr_12_14126710_22227355.eigenvec > $dirlist/chr_12.AA.list
+awk '$3>0.15{print $1}' $dirbase/../PCA/output/chr_12_14126710_22227355.eigenvec > $dirlist/chr_12.BB.list
+awk '$3>0&&$3<0.15{print $1}' $dirbase/../PCA/output/chr_12_14126710_22227355.eigenvec > $dirlist/chr_12.AB.list
+
+```
+
+
+Compute heterozygosity.
+```bash
+
+while read chr pos1 pos2
+do
+        for geno in AA AB BB
+        do
+                while read id
+                do
+                        # echo $id $chr $geno
+                        bcftools query -f '[%GT ]\n' -r $chr:$pos1-$pos2 -s $id $dirvcf/$chr.vcf.gz |sed 's@0/0@0@g;s@0|0@0@g;s@1/1@0@g;s@1|1@0@g;s@0/1@1@g;s@0|1@1@g;s@1|0@1@g;s@\./\.@@g;s@\.|\.@@g' | awk -v chr=$chr -v geno=$geno -v id=$id '{i++;s+=$1}END{print chr,geno,id,s,i,s/i}'
+                done<$dirlist/${chr}.$geno.list
+        done 
+done < $dirlist/class-1.chr_12.bed | awk 'BEGIN{print "chr","geno","id","n.het","n.sites","het"}{print $0}' > $dirout/chr_12.het.txt
+
+
+```
+
+Plot heterozygosity for AA, AB, and BB.
+
+```bash
+
+Rscript $dirscripts/plot_het.R --dir $dirout
+
+```
+
+![](class-1/output/chr_12.het.png)
+
 
 
 
