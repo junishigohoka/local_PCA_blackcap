@@ -384,7 +384,8 @@ done
 ```
 
 
-Make `run_generate_multihetsep.sh` files.
+Make `run_generate_multihetsep_chr_12.<genotype>.sh` files in [`class-1/scripts/run_generate_multihetsep/`](class-1/scripts/run_generate_multihetsep/).
+
 ```bash
 $dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
 

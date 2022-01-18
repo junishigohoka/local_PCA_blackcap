@@ -1,0 +1,1 @@
+--mask \$dir_mask\/C1E2764_chr_12.mask.bed.gz --mask \$dir_mask\/G06_chr_12.mask.bed.gz --mask \$dir_mask\/O065108_chr_12.mask.bed.gz --mask \$dir_mask\/C2T9653_chr_12.mask.bed.gz 
