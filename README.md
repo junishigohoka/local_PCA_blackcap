@@ -259,7 +259,11 @@ do
                 while read id
                 do
                         # echo $id $chr $geno
-                        bcftools query -f '[%GT ]\n' -r $chr:$pos1-$pos2 -s $id $dirvcf/$chr.vcf.gz |sed 's@0/0@0@g;s@0|0@0@g;s@1/1@0@g;s@1|1@0@g;s@0/1@1@g;s@0|1@1@g;s@1|0@1@g;s@\./\.@@g;s@\.|\.@@g' | awk -v chr=$chr -v geno=$geno -v id=$id '{i++;s+=$1}END{print chr,geno,id,s,i,s/i}'
+                        bcftools query -f '[%GT ]\n' \n
+                                -r $chr:$pos1-$pos2 \n
+                                -s $id $dirvcf/$chr.vcf.gz \n
+                        |sed 's@0/0@0@g;s@0|0@0@g;s@1/1@0@g;s@1|1@0@g;s@0/1@1@g;s@0|1@1@g;s@1|0@1@g;s@\./\.@@g;s@\.|\.@@g' \n
+                        | awk -v chr=$chr -v geno=$geno -v id=$id '{i++;s+=$1}END{print chr,geno,id,s,i,s/i}'
                 done<$dirlist/${chr}.$geno.list
         done 
 done < $dirlist/class-1.chr_12.bed | awk 'BEGIN{print "chr","geno","id","n.het","n.sites","het"}{print $0}' > $dirout/chr_12.het.txt
@@ -279,9 +283,7 @@ Rscript $dirscripts/plot_het.R --dir $dirout
 
 ### F<sub>ST</sub>, d<sub>XY</sub> and π
 
-$F_{ST}$
-$\pi$
-
+### $F_{ST}$ $\pi$
 
 
 
