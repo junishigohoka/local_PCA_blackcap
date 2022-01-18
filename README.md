@@ -214,6 +214,7 @@ Rscript $dirscripts/plot_eigenval.R --dirpca $dirout
 dirbase=$PWD/class-1
 dirin=$dirbase/input
 dirvcf=$dirin/vcf
+dirmask=$dirin/mask
 dirlist=$dirbase/list
 dirout=$dirbase/output
 dirscripts=$dirbase/scripts
@@ -358,8 +359,36 @@ The result is written in `class-1/output/permutation_windowstats_class1.csv`.
 
 
 
+### Coalescent time (empirical)
+
+Samples used for coalescent time analysis are listed in `class-1/list/chr_12.AA.4samples.list`, `class-1/list/chr_12.AB.4samples.list` and `class-1/list/chr_12.BB.4samples.list`.
 
 
+Mask files were created using `generate_multihetsep.py` following <https://github.com/stschiff/msmc-tools> from alignment files (BAM) and reference file (FASTA).
+Precomputed mask files are found in `class-1/input/mask/`.
+
+
+Split VCF file into individuals.
+
+```bash
+
+for geno in AA AB BB
+do
+        while read id
+        do
+                echo $geno $id
+                bcftools view -s $id -M2 -m2 $dirvcf/chr_12.vcf.gz | vcftools --vcf - --mac 1 --recode -c | bgzip > $dirvcf/$id.chr_12.vcf.gz
+        done < $dirlist/chr_12.$geno.4samples.list 
+done
+
+```
+
+
+Make `run_generate_multihetsep.sh` files.
+```bash
+$dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
+
+```
 
 
 
