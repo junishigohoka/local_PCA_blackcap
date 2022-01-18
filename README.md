@@ -277,7 +277,7 @@ Rscript $dirscripts/plot_het.R --dir $dirout
 
 ![](class-1/output/chr_12.het.png)
 
-### FST$, dXY and π
+### F<sub>ST</sub>, d<sub>XY</sub> and π
 
 
 
