@@ -156,15 +156,7 @@ Extract SNPs within the local PCA outlier regions.
 
 while read chr from to
 do
-        bcftools view -O z \n
-                -r $chr:$from-$to \n
-                -S $dirlist/blackcap_id.list \n
-                $dirvcf/$chr.vcf.gz \n
-                | vcftools --gzvcf - \n
-                --max-missing 0.9 \n
-                --recode \n
-                --recode-INFO-all -c \n
-                |bgzip > $dirvcf/${chr}_${from}_$to.vcf.gz
+        bcftools view -O z -r $chr:$from-$to -S $dirlist/blackcap_id.list $dirvcf/$chr.vcf.gz | vcftools --gzvcf - --max-missing 0.9 --recode --recode-INFO-all -c |bgzip > $dirvcf/${chr}_${from}_$to.vcf.gz
 done < $dirlist/local_PCA_MDS_outlier.bed
 
 ```
@@ -174,9 +166,7 @@ Run `PLINK` for PCA.
 
 while read chr from to
 do
-        sbatch $dirscripts/plink_pca.sh  \n
-                $dirvcf/${chr}_${from}_$to \n
-                $dirout/${chr}_${from}_$to
+        sbatch $dirscripts/plink_pca.sh  $dirvcf/${chr}_${from}_$to $dirout/${chr}_${from}_$to
 done < $dirlist/local_PCA_MDS_outlier.bed
 
 ```
@@ -185,10 +175,7 @@ done < $dirlist/local_PCA_MDS_outlier.bed
 Plot PCA results.
 ```bash
 
-Rscript $dirscripts/plot_pca_per_outlier.R --dirpca $dirout \n
-        --poplist $dirlist/id_spp_pop_site_pheno.tsv \n
-        --outlierlist $dirlist/local_PCA_MDS_outlier.bed \n
-        --chrlist $dirlist/chromosomes.list
+Rscript $dirscripts/plot_pca_per_outlier.R --dirpca $dirout --poplist $dirlist/id_spp_pop_site_pheno.tsv --outlierlist $dirlist/local_PCA_MDS_outlier.bed --chrlist $dirlist/chromosomes.list
 
 ```
 
@@ -202,14 +189,8 @@ Get Eigenvalues.
 
 while read chr pos1 pos2
 do
-        awk -v chr=$chr \n
-                -v pos1=$pos1 \n
-                -v pos2=$pos2 \n
-                'BEGIN{printf "%s %s %s ", chr,pos1,pos2}{printf "%s ",$1}END{print ""}' \n
-                $dirout/${chr}_${pos1}_${pos2}.eigenval
-done < $dirlist/local_PCA_MDS_outlier.bed \n
-| awk 'NR==1{printf "%s %s %s ","chr","pos1","pos2";for(i=4;i<=NF;i++){printf "%s ","PC"i-3};print ""}{print $0}'\n
-> $dirout/eigenvalues.txt
+        awk -v chr=$chr -v pos1=$pos1 -v pos2=$pos2 'BEGIN{printf "%s %s %s ", chr,pos1,pos2}{printf "%s ",$1}END{print ""}' $dirout/${chr}_${pos1}_${pos2}.eigenval
+done < $dirlist/local_PCA_MDS_outlier.bed | awk 'NR==1{printf "%s %s %s ","chr","pos1","pos2";for(i=4;i<=NF;i++){printf "%s ","PC"i-3};print ""}{print $0}'> $dirout/eigenvalues.txt
 
 
 ```
@@ -253,8 +234,7 @@ Get coordinates of class-1 genomic island of chromosome 12.
 
 ```bash
 
-awk -v OFS="\t" '$1=="chr_12"{$1=$1;print $0}' $dirbase/../local_PCA/output/local_PCA_MDS/local_PCA_MDS_outlier.bed \n
-        > $dirlist/class-1.chr_12.bed
+awk -v OFS="\t" '$1=="chr_12"{$1=$1;print $0}' $dirbase/../local_PCA/output/local_PCA_MDS/local_PCA_MDS_outlier.bed > $dirlist/class-1.chr_12.bed
 
 ```
 
@@ -297,7 +277,10 @@ Rscript $dirscripts/plot_het.R --dir $dirout
 
 ![](class-1/output/chr_12.het.png)
 
-### F<sub>ST</sub>, d<sub>XY</sub> and 
+### F<sub>ST</sub>, d<sub>XY</sub> and π
+
+
+
 
 
 
