@@ -47,8 +47,8 @@ done <$dirlist/chromosomes.list
 
 
 Run local PCA.
-`local_PCA/scripts/local_PCA.sh` submits `local_PCA/scripts/local_PCA.R` via slurm.
-Check `local_PCA/scripts/local_PCA.sh` and  `local_PCA/scripts/local_PCA.R` for detail.
+[`local_PCA/scripts/local_PCA.sh`](local_PCA/scripts/local_PCA.sh) submits [`local_PCA/scripts/local_PCA.R`](local_PCA/scripts/local_PCA.R) via slurm.
+Check [`local_PCA/scripts/local_PCA.sh`](local_PCA/scripts/local_PCA.sh) and [`local_PCA/scripts/local_PCA.R`](local_PCA/scripts/local_PCA.R) for detail.
 
 ```bash
 module load R/3.5.3
@@ -288,7 +288,7 @@ cp $dirbase/../local_PCA/list/chromosomes_length.list $dirlist
 ```
 
 
-Make `chr_12_IDgeno.list`.
+Make [`chr_12_IDgeno.list`](class-1/list/chr_12_IDgeno.list).
 
 ```bash
 
@@ -310,8 +310,8 @@ tabix $dirvcf/chr_12.vcf.gz
 
 
 Run PopGenome.
-`class-1/scripts/PopGenome_windowstats.sh` submits `class-1/scripts/PopGenome_windowstats.R` via slurm.
-Check `class-1/scripts/PopGenome_windowstats.sh` and `class-1/scripts/PopGenome_windowstats.R` for detail.
+[`class-1/scripts/PopGenome_windowstats.sh`](class-1/scripts/PopGenome_windowstats.sh) submits [`class-1/scripts/PopGenome_windowstats.R`](class-1/scripts/PopGenome_windowstats.R via slurm).
+Check [`class-1/scripts/PopGenome_windowstats.sh`](class-1/scripts/PopGenome_windowstats.sh) and [`class-1/scripts/PopGenome_windowstats.R`](class-1/scripts/PopGenome_windowstats.R) for detail.
 
 ```bash
 
