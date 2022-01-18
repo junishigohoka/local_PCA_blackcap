@@ -279,9 +279,65 @@ Rscript $dirscripts/plot_het.R --dir $dirout
 
 ### F<sub>ST</sub>, d<sub>XY</sub> and π
 
+Copy `chromosomes_length.list`.
+
+```bash
+cp $dirbase/../local_PCA/list/chromosomes_length.list $dirlist
+
+```
 
 
+Make `chr_12_IDgeno.list`.
 
+```bash
+
+while read chr pos1 pos2
+do
+        for geno in AA BB
+        do
+                awk -v geno=${chr}.${geno} '{print $1,geno}' $dirlist/${chr}.$geno.list 
+        done |awk 'BEGIN{print "sample","population"}{print $0}' > $dirlist/${chr}_IDgeno.list
+done<$dirlist/class-1.chr_12.bed
+
+```
+
+Tabix input VCF.
+```bash
+tabix $dirvcf/chr_12.vcf.gz
+
+```
+
+
+Run PopGenome.
+`class-1/scripts/PopGenome_windowstats.sh` submits `class-1/scripts/PopGenome_windowstats.R` via slurm.
+Check `class-1/scripts/PopGenome_windowstats.sh` and `class-1/scripts/PopGenome_windowstats.R` for detail.
+
+```bash
+
+win=10000
+while read chr pos1 pos2
+do
+sbatch $dirscripts/PopGenome_windowstats.sh \
+$dirvcf/$chr.vcf.gz \
+$dirlist/chromosomes_length.list \
+$chr \
+$dirlist/${chr}_IDgeno.list \
+$win \
+$dirout/blackcap.$chr.AA.BB
+done<$dirlist/class-1.chr_12.bed
+
+
+```
+
+
+Plot the results.
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_windowstats_class-1.R --dir $dirout --bedfile $dirlist/class-1.chr_12.bed
+
+```
+
+![](class-1/output/chr_12.class-1.windowstats.png)
 
 
 
