@@ -474,6 +474,20 @@ done
 ```
 
 The mean recombination rates are found in [`class-1/output/`](class-1/output) named `chr_12.inv.<geno>_win.10kb_step.10kb.mean.rec.tab`.
+Summarise the output in one file.
+```bash
+paste $dirout/chr_12.inv.AA_win.10kb_step.10kb.mean.rec.tab $dirout/chr_12.inv.AB_win.10kb_step.10kb.mean.rec.tab $dirout/chr_12.inv.BB_win.10kb_step.10kb.mean.rec.tab  | cut -f 1,2,3,4,5,6,12,18 | awk -v OFS="\t" '{if(NR==1){$6="AA";$7="AB";$8="BB"}print $0}' > $dirout/chr_12.rec.10kb.tab
 
+
+```
+
+Plot the results using [`plot_rec_class-1.R`](class-1/scripts/plot_rec_class-1.R)
+
+```bash
+Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
+
+```
+
+![](class-1/output/chr_12.rec.10kb.png)
 
 
