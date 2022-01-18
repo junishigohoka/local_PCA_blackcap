@@ -365,7 +365,7 @@ Samples used for coalescent time analysis are listed in `class-1/list/chr_12.AA.
 
 
 Mask files were created using `generate_multihetsep.py` following <https://github.com/stschiff/msmc-tools> from alignment files (BAM) and reference file (FASTA).
-Precomputed mask files are found in `<class-1/input/mask/>`.
+Precomputed mask files are found in <class-1/input/mask/>.
 
 
 Split VCF file into individuals.
