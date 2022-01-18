@@ -454,3 +454,26 @@ Rscript $dirscripts/plot_tmrca.R --dirlist $dirlist --dirout $dirout
 
 
 
+### Recombination rate (empirical)
+
+Recombination rate was inferred by Karen Bascón-Cardozo using [`pyrho`](https://github.com/popgenmethods/pyrho).
+Raw output of `Pyrho` are [`chr_12.AA.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.AA.maf10_biall_W50_p20.rmap), [`chr_12.AB.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.AB.maf10_biall_W50_p20.rmap), [`chr_12.BB.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.BB.maf10_biall_W50_p20.rmap).
+
+Calculate 10-kb mean recombination rate using [`PyrhoWindowMean.R`](class-1/scripts/PyrhoWindowMena.R).
+
+```bash
+chr=chr_12
+
+for geno in AA AB BB
+do
+        echo $geno
+        chrlen=`awk -v chr=$chr '$1==chr{print $2}' $dirlist/chromosomes_length.list`
+        Rscript $dirscripts/PyrhoWindowMean.R --map $dirout/$chr.$geno.maf10_biall_W50_p20.rmap --winsize 10000 --winstep 10000 --chrlen $chrlen --chr $chr --output $dirout/$chr.inv.$geno
+done
+
+```
+
+The mean recombination rates are found in [`class-1/output/`](class-1/output) named `chr_12.inv.<geno>_win.10kb_step.10kb.mean.rec.tab`.
+
+
+
