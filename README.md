@@ -393,7 +393,7 @@ $dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
 ```
 
 
-Submit them to make [`class-1/scripts/input/multihetsep/`](class-1/input/multihetsep/) files.
+Submit them via slurm to make [`class-1/scripts/input/multihetsep/`](class-1/input/multihetsep/) files.
 
 ```bash
 
@@ -405,6 +405,52 @@ done
 ```
 
 
+Get 0-based index of samples for `MSMC2-decode`.
+
+```bash
+for geno in AA AB BB
+do
+        awk 'BEGIN{c=0}{c++;print $1,2*c-2,2*c-1}' $dirlist/chr_12.$geno.4samples.list > $dirlist/chr_12.$geno.4samples.idx.list
+done
+
+```
+
+
+Based on recommendation of [`MSMC2-decode`](https://github.com/stschiff/msmc/blob/master/guide.md#estimating-the-local-tmrca-states), mutation rate is defined as a half of heterozygosity (Watterson's theta) for mutation rate and 80% of it for recombination rate.
+```bash
+mu=`awk -v m=0.00454362 'BEGIN{print m/2}'`
+rec=`awk -v mu=$mu 'BEGIN{print 0.8*mu}'`
+
+for geno in AA AB BB
+do
+        while read id idx1 idx2
+        do
+                decode -m $mu -r $rec -I $idx1,$idx2 -t 32 -s 10000 $dirmultihetsep/chr_12.$geno.multihetsep.txt > $dirout/chr_12.$geno.$id.posterior.txt
+        done < $dirlist/chr_12.$geno.4samples.idx.list
+done
+
+```
+
+Summarise the discretised times with the highest posterior for each genomic segment.
+```bash
+
+for geno in AA AB BB
+do
+        while read id idx1 idx2
+        do
+                awk '{p=0;k=0;for(i=2;i<=NF;i++){if($i>p){p=$i;k=i}};print $1,k}' $dirout/chr_12.$geno.$id.posterior.txt > $dirout/chr_12.$geno.$id.tmrca.txt
+        done < $dirlist/chr_12.$geno.4samples.idx.list
+done
+
+```
+
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_tmrca.R --dirlist $dirlist --dirout $dirout
+
+```
+
+![](class-1/output/chr_12.tmrca.pdf)
 
 
 

@@ -1,0 +1,3 @@
+prefix interval KW MW_AA_AB MW_BB_AB
+chr_12 in 0 0 0
+chr_12 out 0 0.009 0.117
