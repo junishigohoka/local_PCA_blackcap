@@ -393,7 +393,7 @@ $dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
 ```
 
 
-Submit them to make `class-1/scripts/input/multihetsep/` files.
+Submit them to make [`class-1/scripts/input/multihetsep/`](class-1/scripts/input/multihetsep/) files.
 
 ```bash
 
