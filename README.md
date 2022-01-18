@@ -340,4 +340,29 @@ Rscript $dirscripts/plot_windowstats_class-1.R --dir $dirout --bedfile $dirlist/
 ![](class-1/output/chr_12.class-1.windowstats.png)
 
 
+Run permutation tests.
+
+```bash
+
+while read chr pos1 pos2
+do
+        if [ $chr != "chr_6" ];then
+                Rscript $dirscripts/permutation_windowstats.R --chr $chr --pos1 $pos1 --pos2 $pos2 --n 10000 --pifile $dirout/blackcap.$chr.AA.BB_pi_PopGenome10kb.txt --dxyfile $dirout/blackcap.$chr.AA.BB_dxy_PopGenome10kb.txt --fstfile $dirout/blackcap.$chr.AA.BB_FST_PopGenome10kb.txt
+        fi
+done<$dirlist/class-1.chr_12.bed | awk 'BEGIN{print "chr","pos.from","pos.to","p.val_piAA","p.val_pi.BB","p.val_dxy","p.val_FST","p.val_pi1-pi2"}{print $0}' | sed 's/ /,/g' > $dirout/permutation_windowstats_class1.csv
+
+```
+
+The result is written in `class-1/output/permutation_windowstats_class1.csv`.
+
+
+
+
+
+
+
+
+
+
+
 
