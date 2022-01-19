@@ -2,6 +2,6 @@ local_PCA/input/vcf/*
 local_PCA/input/table/*
 PCA/input/vcf/*
 class-1/input/vcf/*
-slim/msmc2-decode/output/
+slim/msmc2-decode/output/*
 !slim/msmc2-decode/output/model_id_gen_tmrca.txt
 
