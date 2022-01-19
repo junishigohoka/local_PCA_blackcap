@@ -584,7 +584,7 @@ Rscript $dirscripts/plot_hist.R --dirbase $dirbase
 
 ```
 Of course for this tutorial you tried only 10 replicates so the histograms are at low resolution.
-![](slim/MSMC2-decode/figures/gen.png)
+![](slim/msmc2-decode/figures/gen.png)
 
 
 I made lists of id for which I perform MSMC2-decode.
