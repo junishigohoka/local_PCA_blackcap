@@ -1,0 +1,85 @@
+// Initial random seed:
+1829898389710
+
+// RunInitializeCallbacks():
+initializeMutationRate(4.6e-08);
+initializeMutationType(1, 0.5, "f", 0);
+initializeMutationType(2, 0.5, "f", 0);
+initializeGenomicElementType(1, m1, 1);
+initializeGenomicElement(g1, 0, 9999999);
+initializeRecombinationRate(c(1e-06, 0.5, 1e-06), c(4999999, 5000000, 9999999));
+
+// Starting run at generation <start>:
+1 
+
+Burnin: Generation   1
+Burnin: Generation   2
+Burnin: Generation   3
+Burnin: Generation   4
+Burnin: Generation   5
+Burnin: Generation   6
+Burnin: Generation   7
+Burnin: Generation   8
+Burnin: Generation   9
+Burnin: Generation  10
+Burnin: Generation  11
+Burnin: Generation  12
+Burnin: Generation  13
+Burnin: Generation  14
+Burnin: Generation  15
+Burnin: Generation  16
+Burnin: Generation  17
+Burnin: Generation  18
+Burnin: Generation  19
+Burnin: Generation  20
+Burnin: Generation  21
+Burnin: Generation  22
+Burnin: Generation  23
+Burnin: Generation  24
+Burnin: Generation  25
+Burnin: Generation  26
+Burnin: Generation  27
+Burnin: Generation  28
+Burnin: Generation  29
+Burnin: Generation  30
+Burnin: Generation  31
+Burnin: Generation  32
+Burnin: Generation  33
+Burnin: Generation  34
+Burnin: Generation  35
+Burnin: Generation  36
+Burnin: Generation  37
+Burnin: Generation  38
+Burnin: Generation  39
+Burnin: Generation  40
+Burnin: Generation  41
+Burnin: Generation  42
+Burnin: Generation  43
+Burnin: Generation  44
+Burnin: Generation  45
+Burnin: Generation  46
+Burnin: Generation  47
+Burnin: Generation  48
+Burnin: Generation  49
+Burnin: Generation  50
+Generation  50: 999 --    0 I-    1 II 
+Generation 100:  35 --  299 I-  666 II 
+Generation 150:  26 --  307 I-  667 II 
+Generation 200:  39 --  313 I-  648 II 
+Generation 250:  37 --  338 I-  625 II 
+Generation 300:  45 --  315 I-  640 II 
+Generation 350:  28 --  310 I-  662 II 
+Generation 400:  42 --  315 I-  643 II 
+Generation 450:  48 --  299 I-  653 II 
+Generation 500:  34 --  271 I-  695 II 
+Generation 550:  17 --  248 I-  735 II 
+Generation 600:  52 --  362 I-  586 II 
+Generation 650:  29 --  285 I-  686 II 
+Generation 700:  46 --  378 I-  576 II 
+Generation 750:  53 --  339 I-  608 II 
+Generation 800:  39 --  354 I-  607 II 
+Generation 850:  52 --  329 I-  619 II 
+Generation 900:  54 --  368 I-  578 II 
+Generation 950:  49 --  312 I-  639 II 
+Generation1000:  30 --  275 I-  695 II 
+Generation1050:  32 --  328 I-  640 II 

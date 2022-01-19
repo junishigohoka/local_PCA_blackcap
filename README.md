@@ -500,7 +500,7 @@ Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 
 ### Coalescent time
 
-How `MSMC2-decode` behaves at a polymorphic inversion was assessed by simulating a polymorphic inversion using `SLiM`.
+Here I demonstrate how `MSMC2-decode`'s behaviour at a polymorphic inversion was assessed by simulating a polymorphic inversion using `SLiM`.
 
 Note that subfolders in `slim/msmc2-decode/output/` were omitted because even for this small toy data, there were a lot of files.
 Making directories and following the pipeline below should make similar output.
@@ -839,7 +839,206 @@ Outside inversion.
 
 ### Recombination rate
 
+```bash
+dirbase=$PWD/slim/pyrho
+dirout=$dirbase/output
+dirscripts=$dirbase/scripts
 
+```
+
+
+Here I demonstrate how `pyrho` behaves at a polymorphic inversion locus using samples with certain inversion genotype under different recombination suppression models (models 1-6 described in the paper).
+Briefly, the 6 models are
+
+
+chr1: 1 - 5,000,000 [bp]
+chr2: 5,000,001 - 10,000,000 [bp]
+Inversion: 1,000,001 - 4,000,000
+
+
++ Model 1
+        + Inversion freq = 0.2
+        + Recombination suppression: N-I
+
++ Model 2
+        + Inversion freq = 0.2
+        + Recombination suppression: N-I & I-I
+
++ Model 3
+        + Inversion freq = 0.2
+        + Recombination suppression: N-N & N-I & I-I
+
++ Model 4
+        + Inversion freq = 0.8
+        + Recombination suppression: N-I
+
++ Model 5
+        + Inversion freq = 0.8
+        + Recombination suppression: N-I & I-I
+
++ Model 6
+        + Inversion freq = 0.8
+        + Recombination suppression: N-N & N-I & I-I
+
+
+The SLiM scripts are found in [`slim/pyrho/scripts/`](slim/pyrho/scripts/)
+
+Keep submitting the scripts until you get a successful simulation for each model.
+```bash
+cd $dirscripts
+
+for i in {1..6}
+do
+        j=1
+        while [ $j -ge 1 ];
+        do
+                echo model$i
+                slim model$i.slim > $dirout/model$i.log
+                j=`grep lost $dirout/model$i.log | wc -l`
+                echo j is $j
+        done
+done
+
+cd $dirbase/../../
+
+```
+
+Bgzip and index the output VCF files.
+
+```bash
+
+for i in {1..6}
+do
+        bgzip $dirout/model$i.vcf
+        bcftools index $dirout/model$i.vcf.gz
+done
+
+```
+
+
+Split the VCF by (fake) chromosome.
+
+```bash
+
+for i in {1..6}
+do
+        bcftools view -t 1:1-5000000 $dirout/model$i.vcf.gz | bgzip > $dirout/model$i.chr1.vcf.gz
+        bcftools index $dirout/model$i.chr1.vcf.gz
+        bcftools view -t 1:5000001-10000000 $dirout/model$i.vcf.gz | bgzip > $dirout/model$i.chr2.vcf.gz
+        bcftools index $dirout/model$i.chr2.vcf.gz
+done
+
+```
+
+
+Make list of IDs and their inversion genotypes.
+```bash
+for i in {1..6}
+do
+        bcftools query -r 1:1000001  -f '[%GT ]' $dirout/model$i.vcf.gz | awk '{for(i=1;i<=NF;i++){print "i"i-1,$(i)}}' > $dirout/model$i.id.gt.list
+        awk '$2=="0|0"{print $1}' $dirout/model$i.id.gt.list > $dirout/model$i.NN.list
+        awk '$2=="0|1"||$2=="1|0"{print $1}' $dirout/model$i.id.gt.list > $dirout/model$i.NI.list
+        awk '$2=="1|1"{print $1}' $dirout/model$i.id.gt.list > $dirout/model$i.II.list
+done
+
+```
+
+Make list of random 10 samples for each genotype and then make VCF including them.
+```bash
+for i in {1..6}
+do
+        for geno in NN NI II
+        do
+                shuf $dirout/model$i.$geno.list | head -n 10 > $dirout/model$i.$geno.10samples.list
+                bcftools view -S $dirout/model$i.$geno.10samples.list $dirout/model$i.chr1.vcf.gz | vcftools --vcf - --mac 1 --recode -c | bgzip > $dirout/model$i.$geno.chr1.vcf.gz
+                bcftools index $dirout/model$i.$geno.chr1.vcf.gz
+                bcftools view -S $dirout/model$i.$geno.10samples.list $dirout/model$i.chr2.vcf.gz | vcftools --vcf - --mac 1 --recode -c | bgzip > $dirout/model$i.$geno.chr2.vcf.gz
+                bcftools index $dirout/model$i.$geno.chr2.vcf.gz
+        done
+done
+
+
+```
+
+
+Make lookup table and determine hyperparameters. 
+It takes some time...
+Precomputed results are `slim/pyrho/output/pyrho_lookup` and [`slim/pyrho/output/pyrho_hyperparam_results.txt`](slim/pyrho/output/pyrho_hyperparam_results.txt)
+
+```bash
+
+module load python/3.6.0
+
+pyrho make_table --samplesize 20 --approx --moran_pop_size 25 --mu 4.6e-6 --outfile $dirout/pyrho_lookup --popsizes 1000,1000 --epochtimes 1000
+
+pyrho hyperparam -n 20 --mu 4.6e-8 --blockpenalty 50,100 \
+	--windowsize 25,50 --logfile . --tablefile $dirout/pyrho_lookup \
+	--num_sims 10 \
+	--popsizes 1000,1000 --epochtimes 1000 --outfile $dirout/pyrho_hyperparam_results.txt
+
+
+```
+
+Using `--blockpenalty` of 50 and `--windowsize` of 50, run `pyrho` to infer recombination rates for chromosomes 1 and 2 (with and without inversion) using certain genotypes.
+```bash
+module load python/3.6.0
+for i in {1..6}
+do
+        for j in 1 2
+        do
+                for geno in NN NI II
+                do
+                        pyrho optimize --tablefile $dirout/pyrho_lookup \
+                         --vcffile $dirout/model$i.$geno.chr$j.vcf.gz \
+                         --outfile $dirout/model$i.$geno.chr$j.rmap \
+                         --blockpenalty 50 --windowsize 50 \
+                         --logfile .
+                 done
+        done
+done
+
+```
+
+Edit the `pyrho` output to cM/Mb.
+```bash
+
+for i in {1..6}
+do
+        for j in 1 2
+        do
+                for geno in NN NI II
+                do
+                        awk -f $dirscripts/edit_map.awk $dirout/model$i.$geno.chr$j.rmap > $dirout/model$i.$geno.chr$j.rmap.cMMb.txt
+                done
+        done
+done
+
+
+```
+
+
+Edit chr2, so that the position starts from 1.
+```bash
+for i in {1..6}
+do
+        for geno in NN NI II
+        do
+                awk '{print $1-5000000,$2,$3}' $dirout/model$i.$geno.chr2.rmap.cMMb.txt > $dirout/tmp
+                mv $dirout/tmp $dirout/model$i.$geno.chr2.rmap.cMMb.txt
+        done
+done
+
+```
+
+
+Plot the results
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_slim_pyrho.R --dirout $dirout
+
+```
+
+![](slim/pyrho/output/slim.pyrho.png)
 
 
 

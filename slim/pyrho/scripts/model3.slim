@@ -1,0 +1,75 @@
+// set up a simple neutral simulation
+initialize() {
+ initializeMutationRate(4.6e-8);
+ initializeMutationType("m1", 0.5, "f", 0.0);
+ initializeMutationType("m2", 0.5, "f", 0.0); // inversion marker
+ //m2.color="red";
+ // g1 genomic element type: uses m1 for all mutations
+ initializeGenomicElementType("g1", m1, 1.0);
+
+ // uniform recombination
+ initializeGenomicElement(g1, 0, 9999999);
+ 
+ // Two chromosomes of 1Mb
+ rates = c(1e-6, 0.5, 1e-6);
+ ends = c(4999999,5000000,9999999);
+ initializeRecombinationRate(rates, ends);
+}	
+//fitness of the inversion is frequency-dependent, to make it persist at freq of 0.1
+fitness(m2){
+ f = sim.mutationFrequencies(NULL, mut);
+ return 1.0-(f-0.2) * 2;
+}
+// Recombination rate in the inversion
+recombination() {
+ //if (genome1.containsMarkerMutation(m2,1000000) == genome2.containsMarkerMutation(m2,1000000))
+  //return F;
+  //if(genome1.containsMarkerMutation(m2,1000000)==F&genome2.containsMarkerMutation(m2,1000000)==F)
+  //return F;
+ inInv = (breakpoints > 1000000) & (breakpoints < 4000000);
+ if (!any(inInv))
+  return F;
+ breakpoints = breakpoints[!inInv];
+  return T;
+}
+
+// create a population of 1e+4 individuals and run a burnin for 100 generations
+1 {
+ sim.addSubpop("p1", 1e+3);
+}
+1:50{
+         cat("Burnin: Generation"+format("%4d",sim.generation) + "\n");
+}
+// At 500th generation, introduce inversion
+50 late(){
+ // give 1 sample the inversion
+ inverted = sample(p1.individuals, 1);
+ inverted.genomes.addNewDrawnMutation(m2,1000000);
+}
+50:1050 late() {
+  if(sim.generation % 50 !=0)
+   return; 
+ //assess the prevalence of the inversion
+ pScr = "sum(sum(applyValue.genomes.containsMarkerMutation(m2,1000000)));";
+ p = sapply(p1.individuals, pScr);
+ p__ = sum( p==0 );
+ pI_ = sum(p == 1);
+ pII = sum(p == 2);
+ cat("Generation"+format("%4d",sim.generation) + ": ");
+ cat(format("%3d", p__) + " --  ");
+ cat(format("%3d", pI_) + " I-  ");
+ cat(format("%3d", pII) + " II \n");
+ if(p__==0) stop("Inversion fixed");
+ if(pII==0) stop("Inversion lost");
+}
+1050 late(){
+ // Here I want to output two VCF files
+ // VCF 1: 4 samples without m2 mutation (--) at position 2500000
+ // VCF 2: 4 samples with m2 mutation (II) at position 2500000
+ //AAind=p1.individuals[!(p1.individuals.genome1.containsMarkerMutation(m2,2500000))&!(p1.individuals.genome2.containsMarkerMutation(m2,2500000))];
+
+
+ //BBind.genomes[0:7].outputVCF(vcfBB);
+ p1.genomes.outputVCF("../output/model3.vcf");
+}
+
