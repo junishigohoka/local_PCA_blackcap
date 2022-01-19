@@ -207,7 +207,9 @@ Rscript $dirscripts/plot_eigenval.R --dirpca $dirout
 
 
 
-## Class-1 genomic islands (empirical)
+## Population genomics of class-1 genomic islands (empirical)
+
+Here I demonstrate how population genomic analyses were performed on class-1 genomic islands, using chromosome 12 as an example.
 
 ```bash
 
@@ -393,7 +395,7 @@ $dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
 ```
 
 
-Submit them via slurm to make [`class-1/scripts/input/multihetsep/`](class-1/input/multihetsep/) files.
+Submit them via slurm to make [multihetsep files](class-1/input/multihetsep/).
 
 ```bash
 
@@ -417,6 +419,8 @@ done
 
 
 Based on recommendation of [`MSMC2-decode`](https://github.com/stschiff/msmc/blob/master/guide.md#estimating-the-local-tmrca-states), mutation rate is defined as a half of heterozygosity (Watterson's theta) for mutation rate and 80% of it for recombination rate.
+Watterson's theta was computed using chromosome 20, and was 0.00454362.
+
 ```bash
 mu=`awk -v m=0.00454362 'BEGIN{print m/2}'`
 rec=`awk -v mu=$mu 'BEGIN{print 0.8*mu}'`
@@ -450,7 +454,7 @@ Rscript $dirscripts/plot_tmrca.R --dirlist $dirlist --dirout $dirout
 
 ```
 
-![text](class-1/output/chr_12.tmrca.png)
+![](class-1/output/chr_12.tmrca.png)
 
 
 
@@ -493,6 +497,126 @@ Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 
 
 ## Class-1 genomic islands (simulation)
+
+### Coalescent time
+
+How `MSMC2-decode` behaves at a polymorphic inversion was assessed by simulating a polymorphic inversion using `SLiM`.
+
+```bash
+dirbase=slim/msmc2-decode
+dirscripts=$dirbase/scripts
+dirlist=$dirbase/list
+dirout=$dirbase/output
+        dirlog=$dirout/log
+        dirsum=$dirout/summary
+        dirvcf=$dirout/vcf
+        dirvcfind=$dirout/vcfind
+        dirmultihetsep=$dirout/multihetsep
+        dirdecode=$dirout/msmc-decode
+        dirdecodesum=$dirout/msmc-decode_summary
+dirfigures=$dirbase/figures
+
+```
+
+The list of parameters are written in [`slim/msmc2-decode/list/parameters.list`](slim/msmc2-decode/list/parameters.list)
+The 9 lines correspond to the 9 models described in the paper.
+
+
+
+Prepare SLiM scripts from [template](slim/msmc2-decode/scripts/template.slim).
+
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        sed -e "s/f0/$f0/g;s/f1/$f1/g;s/s0/$s0/g;s/h0/$h0/g;s/s1/$s1/g;s/h1/$h1/g;s/s2/$s2/g;s/h2/$h2/g;s/model/$model/g;s@DIRBASE@$dirbase@g" $dirscripts/template.slim | awk -v FD=$FD 'NR<22||NR>26{print $0}NR>=22&&NR<=26{if(FD==0){print "//",$0}else{print $0}}' > $dirscripts/$model.slim
+done<$dirlist/parameters.list
+
+```
+
+Now new `.slim` files were created in [`slim/msmc2-decode/scripts/`](slim/msmc2-decode/scripts/).
+
+
+Make slurm commands to submit scripts and write them in [`slim/msmc2-decode/scripts/slim.commands.list`](slim/msmc2-decode/scripts/slim.commands.list).
+In the paper I made 10,000 commands but here make 10.
+Check [`slim/msmc2-decode/scripts/slim.sh`](slim/msmc2-decode/scripts/slim.sh) for detail.
+
+```bash
+
+for i in {0..9}
+do
+        id=`printf "%04d" $i`
+        echo sbatch $dirscripts/slim.sh $dirbase $id
+done > $dirscripts/slim.commands.list
+
+```
+
+
+Submit them. 
+```bash
+chmod +x $dirscripts/slim.commands.list
+$dirscripts/slim.commands.list slim 200 100
+
+```
+
+Log files of SLiM are found in [`slim/msmc2-decode/output/log`](slim/msmc2-decode/output/log).
+VCF files for (at maximum) 5 time points are found in [`slim/msmc2-decode/output/vcf`](slim/msmc2-decode/output/vcf).
+
+
+Based on the log files, summarise how many generations inversion stayed in population for all simulations.
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for i in {0..9}
+        do
+                id=`printf "%04d" $i`
+                tail -n1 $dirlog/${model}_$id.log | awk -v id=$id -v model=$model '{print model,id,$1-4000}'
+        done 
+done<$dirlist/parameters.list > $dirlog/model_id_lastgen.txt
+
+```
+
+Plot the distribution of generations when inversion is lost.
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_hist.R --dirbase $dirbase
+
+```
+Of course for this tutorial you tried only 10 replicates so the histograms are at low resolution.
+![](slim/figures/gen.png)
+
+
+I made lists of id for which I perform MSMC2-decode.
+I made 60 lists in total because of 12 models x 5 time points.
+```bash
+cd $dirvcf
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                ls ${model}_*_gen.$gen.vcf 2> /dev/null | awk -v FS="_" '{print $3}' > $dirlist/vcf_id/${model}_gen.${gen}.list  
+        done
+done<$dirlist/parameters.list 
+
+cd $dirbase/../../
+
+```
+
+
+
+
+### Recombination rate
+
+
+
+
+
+## Phylogenetics of inversion
+
+
+
+
 
 
 

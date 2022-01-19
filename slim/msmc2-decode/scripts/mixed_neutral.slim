@@ -1,0 +1,77 @@
+// set up a simple neutral simulation
+initialize() {
+        initializeMutationRate(1e-7);
+        initializeMutationType("m0", 0.5, "f", 0); // neutral mutations
+        initializeMutationType("m1", 0.5, "f", -0.02); // deleterious mutations
+        initializeMutationType("m2", 0.5, "f", 0); // inversion marker
+        //m2.color="red";
+        // g1 genomic element type: uses m1 for all mutations
+        initializeGenomicElementType("g1", c(m0 ,m1), c(0.8,0.2));
+
+        // uniform recombination
+        initializeGenomicElement(g1, 0, 499999);
+
+        // Two chromosomes of 1Mb
+        //rates = c(1e-6, 0.5, 1e-6);
+        //ends = c(4999999,5000000,9999999);
+        rates=1e-6;
+        ends=499999;
+        initializeRecombinationRate(rates, ends);
+}	
+//fitness of the inversion is frequency-dependent, to make it persist at freq of 0.1
+// fitness(m2){
+//         f = sim.mutationFrequencies(NULL,mut); 
+//         dominance = asInteger(homozygous) * 0.5 + 0.5;
+//         return 1.0-(f-0.1) * dominance;
+// }
+
+// Recombination rate in the inversion
+recombination() {
+        if (genome1.containsMarkerMutation(m2,100000) == genome2.containsMarkerMutation(m2,100000))
+                return F;
+        //if(genome1.containsMarkerMutation(m2,100000)==F&genome2.containsMarkerMutation(m2,100000)==F)
+        //return F;
+        inInv = (breakpoints > 100000) & (breakpoints < 400000);
+        if (!any(inInv))
+                return F;
+        breakpoints = breakpoints[!inInv];
+        return T;
+}
+
+// create a population of 1e+4 individuals and run a burnin for 100 generations
+1 {
+        sim.addSubpop("p1", 1e+3);
+}
+1:4000{
+          //cat("Burnin: Generation"+format("%4d",sim.generation) + "\n");
+  }
+// At 500th generation, introduce inversion
+4000 late(){
+        // give 1 sample the inversion
+        inverted = sample(p1.individuals, 1);
+        inverted.genomes.addNewDrawnMutation(m2,100000);
+        cat("generation ");
+        cat("NN ");
+        cat("NI ");
+        cat("II\n");
+}
+4000:8000 late() {
+             if (sim.generation == 4100 | sim.generation == 4500 | sim.generation == 5000 | sim.generation == 6000 | sim.generation == 8000 )
+                     p1.genomes.outputVCF("slim/msmc2-decode/output/vcf/"+OUTPUT+"_gen."+sim.generation+".vcf");
+                     pScr = "sum(sum(applyValue.genomes.containsMarkerMutation(m2,100000)));";
+             p = sapply(p1.individuals, pScr);
+             p__ = sum( p==0 );
+             pI_ = sum(p == 1);
+             pII = sum(p == 2);
+             //cat("Generation"+format("%4d",sim.generation) + ": ");
+             cat(sim.generation + " ");
+             cat(p__ + " ");
+             cat(pI_ + " ");
+             cat(pII + "\n");
+             if(p__==0) stop();
+             if(pII+pI_==0) stop();
+     }
+//2000 late(){
+//        p1.genomes.outputVCF("../output/",OUTPUT,".vcf");
+//}
+

@@ -1,0 +1,43 @@
+// Initial random seed:
+1673281927612
+
+// RunInitializeCallbacks():
+initializeMutationRate(1e-07);
+initializeMutationType(0, 0.5, "f", 0);
+initializeMutationType(1, 0.5, "f", -0.02);
+initializeMutationType(2, -0.5, "f", -0.05);
+initializeGenomicElementType(1, c(m0, m1), c(1, 0));
+initializeGenomicElement(g1, 0, 499999);
+initializeRecombinationRate(1e-06, 499999);
+
+// Starting run at generation <start>:
+1 
+
+generation NN NI II
+4000 999 0 1
+4001 999 1 0
+4002 998 2 0
+4003 997 3 0
+4004 994 6 0
+4005 988 12 0
+4006 982 18 0
+4007 981 19 0
+4008 978 22 0
+4009 975 25 0
+4010 974 26 0
+4011 982 18 0
+4012 984 16 0
+4013 988 12 0
+4014 990 10 0
+4015 990 10 0
+4016 988 12 0
+4017 995 5 0
+4018 996 4 0
+4019 998 2 0
+4020 994 6 0
+4021 995 5 0
+4022 998 2 0
+4023 997 3 0
+4024 997 3 0
+4025 997 3 0
+4026 1000 0 0
