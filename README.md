@@ -503,7 +503,7 @@ Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 How `MSMC2-decode` behaves at a polymorphic inversion was assessed by simulating a polymorphic inversion using `SLiM`.
 
 ```bash
-dirbase=slim/msmc2-decode
+dirbase=$PWD/slim/msmc2-decode
 dirscripts=$dirbase/scripts
 dirlist=$dirbase/list
 dirout=$dirbase/output
@@ -538,12 +538,12 @@ Now new `.slim` files were created in [`slim/msmc2-decode/scripts/`](slim/msmc2-
 
 
 Make slurm commands to submit scripts and write them in [`slim/msmc2-decode/scripts/slim.commands.list`](slim/msmc2-decode/scripts/slim.commands.list).
-In the paper I made 10,000 commands but here make 10.
+In the paper I made 10,000 commands but here make 100.
 Check [`slim/msmc2-decode/scripts/slim.sh`](slim/msmc2-decode/scripts/slim.sh) for detail.
 
 ```bash
 
-for i in {0..9}
+for i in {0..99}
 do
         id=`printf "%04d" $i`
         echo sbatch $dirscripts/slim.sh $dirbase $id
@@ -568,7 +568,7 @@ Based on the log files, summarise how many generations inversion stayed in popul
 
 while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
 do
-        for i in {0..9}
+        for i in {0..99}
         do
                 id=`printf "%04d" $i`
                 tail -n1 $dirlog/${model}_$id.log | awk -v id=$id -v model=$model '{print model,id,$1-4000}'
@@ -583,13 +583,14 @@ module load R/3.5.3
 Rscript $dirscripts/plot_hist.R --dirbase $dirbase
 
 ```
-Of course for this tutorial you tried only 10 replicates so the histograms are at low resolution.
 ![](slim/msmc2-decode/figures/gen.png)
 
 
-I made lists of id for which I perform MSMC2-decode.
-I made 60 lists in total because of 12 models x 5 time points.
+Make lists of id for which MSMC2-decode is performed.
+Make 45 lists in total because of 9 models x 5 time points in [`slim/msmc2-decode/list/vcf_id`](slim/msmc2-decode/list/vcf_id).
+
 ```bash
+mkdir $dirlist/vcf_id
 cd $dirvcf
 while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
 do
@@ -602,6 +603,232 @@ done<$dirlist/parameters.list
 cd $dirbase/../../
 
 ```
+
+
+Check the distribution of genotype & allele frequencies for each time points of simulations for which `MSMC2-decode` is performed.
+
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                while read id
+                do
+                        awk -v gen=$gen -v id=$id -v model=$model 'BEGIN{i=0}{if($1=="generation"){i=1}else if(i==1){if($1==gen){print model,$1,id,$2,$3,$4,2*$2+$3,2*$4+$3;kill}}}'  $dirlog/${model}_$id.log 
+                done<$dirlist/vcf_id/${model}_gen.$gen.list
+        done
+done<$dirlist/parameters.list > $dirsum/model_gen_id_gf_af.txt
+
+```
+
+The first few lines of [`slim/msmc2-decode/output/summary/model_gen_id_gf_af.txt`](slim/msmc2-decode/output/summary/model_gen_id_gf_af.txt) are something like
+
+```
+neutral_neutral 4100 0072 999 1 0 1999 1
+neutral_OD 4100 0000 897 100 3 1894 106
+neutral_OD 4100 0015 779 214 7 1772 228
+neutral_OD 4100 0023 816 173 11 1805 195
+
+```
+
+where the columns are, 1. model, 2. time including 4,000 burnin, 3. index/id of the simulation, 4. number of NN, 5. number of NI, 6. number of II, 7. number of N, 8. number of I.
+
+
+Plot the distribution of genotype and allele frequencies for them.
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_gf_af.R --dirout $dirsum --dirfig $dirfigures
+
+```
+![](figures/gt_af.png)
+
+
+
+Prepare input for `MSMC2-decode`.
+
+First bgzip and index all VCF files.
+
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                sbatch $dirscripts/bcftools_bgzip_index.sh $model $gen $dirvcf $dirlist
+        done
+done<$dirlist/parameters.list 
+
+```
+
+Make list of IDs for individuals and their inversion genotypes.
+```bash
+
+mkdir $dirlist/genotype
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                sbatch $dirscripts/genotype.sh $dirbase $model $gen
+        done
+done<$dirlist/parameters.list  
+
+```
+
+
+
+Select 4 samples for each genotype.
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                sbatch $dirscripts/sample_4ind.sh $dirbase $model $gen
+        done
+done<$dirlist/parameters.list  
+
+```
+
+
+Make individual VCF for each of these samples.
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                echo $model $gen
+                sbatch $dirscripts/bcftools_ind.sh $dirbase $model $gen
+        done
+done<$dirlist/parameters.list  
+
+```
+
+
+Make negative mask file (specifying which parts to be used).
+```bash
+awk -v OFS="\t" 'BEGIN{print 1,0,5000000}' | bgzip > $dirlist/mask.bed.gz
+
+```
+
+Make multihetsep files.
+```bash
+
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                sbatch $dirscripts/run_generate_multihetsep.sh $dirbase $model $gen
+        done
+done<$dirlist/parameters.list
+
+```
+
+
+Make list of samples' 0-based indeces used in `MSMC2-decode`
+```bash
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                while read id
+                do
+                        for geno in NN NI II
+                        do
+                                awk 'BEGIN{c=0}{c++;print $1,2*c-2,2*c-1}' $dirlist/genotype/${model}_${id}_gen.$gen.$geno.4samples.list > $dirlist/genotype/${model}_${id}_gen.$gen.$geno.4samples.idx.list
+                        done
+                done<$dirlist/vcf_id/${model}_gen.$gen.list
+        done
+done<$dirlist/parameters.list
+
+```
+
+
+Prepare scritps for `MSMC2-decode`.
+```bash
+mu=4e-4
+rec=4e-3
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                while read id
+                do
+                        echo sbatch $dirscripts/decode.sh $dirbase $model $gen $id
+                done<$dirlist/vcf_id/${model}_gen.$gen.list
+        done
+done<$dirlist/parameters.list > $dirscripts/decode.commands.list
+
+```
+
+Submit them. 
+```bash
+chmod +x $dirscripts/decode.commands.list
+$dirscripts/decode.commands.list 
+
+```
+
+
+Summarise TMRCA for each genotype for each simulation.
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                while read id
+                do
+                        echo sbatch $dirscripts/summarise_decode.1.sh $dirbase $model $gen $id 
+                done<$dirlist/vcf_id/${model}_gen.$gen.list
+        done
+done<$dirlist/parameters.list  > $dirscripts/summarise_decode.1.commands.list
+
+chmod +x $dirscripts/summarise_decode.1.commands.list
+$dirscripts/summarise_decode.1.commands.list 
+
+
+```
+
+
+Calculate average descretised TMRCA within inversion and outside inversion for each genotype for each simulation.
+```bash
+
+while read f0 f1 s0 h0 s1 h1 s2 h2 FD model
+do
+        for gen in 4100 4500 5000 6000 8000
+        do
+                while read id
+                do
+                        for geno in NN NI II
+                        do
+                                if [[ ! -f $dirdecodesum/${model}_${id}_gen.$gen.$geno.decode-sum.txt ]];then
+                                        touch $dirdecodesum/${model}_${id}_gen.$gen.$geno.decode-sum.txt
+                                fi
+                                awk 'BEGIN{nin=0;nout=0}$1>100000&&$1<=400000{nin++;sumin+=$2}$1<=100000||$1>400000{nout++;sumout+=$2}END{if(nin==0){meanin="NA"}else{meanin=sumin/nin};if(nout==0){meanout="NA"}else{meanout=sumout/nout};print meanin,meanout}' $dirdecodesum/${model}_${id}_gen.$gen.$geno.decode-sum.txt
+                        done  | awk 'BEGIN{ORS=" "}{print $0}END{ORS="\n"}' | awk -v model=$model -v id=$id -v gen=$gen '{print model,id,gen,geno,$0}'
+                done<$dirlist/vcf_id/${model}_gen.$gen.list
+        done
+done<$dirlist/parameters.list  >  $dirout/model_id_gen_tmrca.txt
+awk 'BEGIN{print "model","id","gen","NNin","NNout","NIin","NIout","IIin","IIout"}{print $0}' $dirout/model_id_gen_tmrca.txt > $dirout/tmp ; mv $dirout/tmp $dirout/model_id_gen_tmrca.txt
+
+
+```
+
+Plot the results.
+```bash
+Rscript $dirscripts/plot_tmrca.R --dirout $dirout --dirfig $dirfigures
+
+```
+
+Inside inversion.
+![](slim/msmc2-decode/figures/tmrca_in.png)
+
+
+Outside inversion.
+![](slim/msmc2-decode/figures/tmrca_out.png)
 
 
 

@@ -30,7 +30,7 @@ for(i in 1:nlevels(d$model)){
              col="gray",
              border=NA,
              xlim=c(0,4000),
-             ylim=c(0,10),
+             ylim=c(0,100),
              xlab="Time (generations)",
              las=1
         )

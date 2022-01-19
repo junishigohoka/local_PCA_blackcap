@@ -1,5 +1,5 @@
 // Initial random seed:
-1673301928216
+1683985716581
 
 // RunInitializeCallbacks():
 initializeMutationRate(1e-07);
@@ -15,5 +15,9 @@ initializeRecombinationRate(1e-06, 499999);
 
 generation NN NI II
 4000 999 0 1
-4001 999 1 0
-4002 1000 0 0
+4001 996 4 0
+4002 994 6 0
+4003 996 4 0
+4004 997 3 0
+4005 998 2 0
+4006 1000 0 0
