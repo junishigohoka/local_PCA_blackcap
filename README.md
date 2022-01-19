@@ -502,6 +502,10 @@ Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 
 How `MSMC2-decode` behaves at a polymorphic inversion was assessed by simulating a polymorphic inversion using `SLiM`.
 
+Note that subfolders in `slim/msmc2-decode/output/` were omitted because even for this small toy data, there were a lot of files.
+Making directories and following the pipeline below should make similar output.
+
+
 ```bash
 dirbase=$PWD/slim/msmc2-decode
 dirscripts=$dirbase/scripts
