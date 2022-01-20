@@ -1085,9 +1085,33 @@ Rscript $dirscripts/plot_synteny_BC_sp.R --chrlen $dirlist/ZF_VGP_chromosomes_le
 
 ```
 ![](synteny/output/BC_zebra_finch_satsuma.png)
-=======
+
+
+Extract which parts of zebra finch genome are syntenic to blackcap class-1 genomic islands.
+
+```bash
+
+while read chr pos1 pos2
+do
+        awk -v chr=$chr -v pos1=$pos1 -v pos2=$pos2 -v OFS="\t" '$4==chr&&(($5<=pos1&&$6>pos1)||($5<=pos2&&$6>pos2)||($5>=pos1&&$6<pos2)){print "chr"$1,$2-1,$3}' $dirout/zebrafinch_blackcap_satsuma.txt > $dirout/ZF_synteny_BC_$chr.$pos1.$pos2.bed
+done<$dirlist/local_PCA_MDS_class-1.bed 
+
+```
+
+Class-1 genomic island of blackcap chromosome 12 14,126,710-22,227,355 bp are syntenic to zebra finch chromosome 11 10,390-7,293,168, which overlaps with an inversion spanning 0.086–12.29 Mb of zebra finch chromosome 11 identified in [Knief et al., 2016](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1056-3).
+
+Blackcap chromosome 14 43-259,166 bp are syntenic to zebra finch chromosome 13 238,259-642,861 bp, which overlaps with an inversion at 0.15-16.91 Mb.
+Blackcap chromosome 6 5,684,792-6,260,313 bp are syntenic to zebra finch chromosome 5 1,150,537-6,749,689 bp, which overlaps with an inversion at chromosome 5 0.96–16.50 Mb.
+
+Blackcap class-1 genomic islands on chromosomes 28 and 30 are syntenic to zebra finch chromsomes 22 and 25, which do not overlap with zebra finch inversions.
+
+
+
+
+
 ## Phylogenetics of inversion
 
+Next, using blackcap chromosome 12 and zebra finch chromosome 11 as an example
 
 
 
