@@ -1064,8 +1064,8 @@ We call this FASTA file with the converted chromosome notation "bSylAtr1.1.fa" (
 
 `SatsumaSynteny` was run for homology-based synteny analysis between blackcap and zebra finch genomes.
 This was done by Karen Bascón-Cardozo.
-Precomputed file is [`satsuma_summary.chained.out`](satsuma_summary.chained.out). 
-
+Bgzipped precomputed file is `satsuma_summary.chained.out.gz`.
+Gunzip it before preceeding.
 
 Format the output.
 
@@ -1085,18 +1085,14 @@ Rscript $dirscripts/plot_synteny_BC_sp.R --chrlen $dirlist/ZF_VGP_chromosomes_le
 
 ```
 ![](synteny/output/BC_zebra_finch_satsuma.png)
+=======
+## Phylogenetics of inversion
 
 
 
 
 
-## ML phylogeny 
 
-Reference genome of zebra finch (taeGut1, WUSTL v3.2.4) was downloaded (not included in this repo due to its size).
-```bash
-rsync -avzP  rsync://hgdownload.cse.ucsc.edu/goldenPath/taeGut1/bigZips/taeGut1.fa.gz 
-zcat taeGut1.fa.gz > $dirin/Tgu.fa
 
-```
 
 
