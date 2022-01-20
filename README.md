@@ -1042,13 +1042,61 @@ Rscript $dirscripts/plot_slim_pyrho.R --dirout $dirout
 
 
 
-## Phylogenetics of inversion
+## Synteny analysis
+### Synteny between blackcap and zebra finch
+
+```bash
+dirbase=$PWD/synteny
+dirscripts=$dirbase/scripts
+dirlist=$dirbase/list
+dirin=$dirbase/input
+dirout=$dirbase/output
+
+```
+
+VGP reference genome of zebra finch was obtained from <https://www.ncbi.nlm.nih.gov/assembly/GCF_008822105.2>.
+This version of reference was chosen and downloaded by Karen Bascón-Cardozo.
+
+VGP reference genome of blackcap was downloaded from <https://vgp.github.io/genomeark/Sylvia_atricapilla/> (`bSylAtr1.pri.cur.20190916.fasta.gz`).
+We renamed the chromosomes as listed in `synteny/list/conversion_key_chr.csv`. 
+This conversion was done by Andrea Bours.
+We call this FASTA file with the converted chromosome notation "bSylAtr1.1.fa" (this file is not included in the repo due to its size).
+
+`SatsumaSynteny` was run for homology-based synteny analysis between blackcap and zebra finch genomes.
+This was done by Karen Bascón-Cardozo.
+Precomputed file is [`satsuma_summary.chained.out`](satsuma_summary.chained.out). 
+
+
+Format the output.
+
+```bash
+awk '$1~"chromosome"&&$1!~"scaffold"{gsub("^.*Blue55_chromosome_","",$1);gsub(",.*","",$1);print $1,$2,$3,$4,$5,$6}' $dirout/satsuma_summary.chained.out  > $dirout/zebrafinch_blackcap_satsuma.txt
+
+```
+
+Coordinates of all local PCA outlier regions were copied to [`synteny/list/local_PCA_MDS_outlier.bed`](synteny/list/local_PCA_MDS_outlier.bed).
+Coordinates of 5 class-1 genomic islands were copied to [`synteny/list/local_PCA_MDS_class-1.bed`](synteny/list/local_PCA_MDS_class-1.bed).
+Make circos plots.
+
+
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_synteny_BC_sp.R --chrlen $dirlist/ZF_VGP_chromosomes_length.list --satsuma $dirout/zebrafinch_blackcap_satsuma.txt --sppname "zebra finch" --dirout $dirout --dirlist $dirlist
+
+```
+![](synteny/output/BC_zebra_finch_satsuma.png)
 
 
 
 
 
+## ML phylogeny 
 
+Reference genome of zebra finch (taeGut1, WUSTL v3.2.4) was downloaded (not included in this repo due to its size).
+```bash
+rsync -avzP  rsync://hgdownload.cse.ucsc.edu/goldenPath/taeGut1/bigZips/taeGut1.fa.gz 
+zcat taeGut1.fa.gz > $dirin/Tgu.fa
 
+```
 
 
