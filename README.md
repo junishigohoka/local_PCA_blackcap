@@ -1512,10 +1512,6 @@ do
 done
 
 
-# Edited the leaf names
-        #sed 's/SylBor/Garden_warbler/;s/ZF./Zebra_finch/;s/LonStr/Bengalese_finch/;s/BC./Blackcap/;s/AA//g;s/AcaChl/Rifleman/;s/$chr//g' $dirraxml/RAxML_bipartitions.BC.$chr.background.bootstrap.final > $dirraxml/$chr.background.RAxML.bootstrap.txt
-        #sed 's/SylBor/Garden_warbler/;s/ZF.AA/Zebra_finch_haplotype_A/;s/ZF.BB/Zebra_finch_haplotype_B/;s/LonStr/Bengalese_finch/;s/BC.AA/Blackcap_haplotype_A/;s/BC.BB/Blackcap_haplotype_B/;s/AcaChl/Rifleman/' $dirraxml/RAxML_bipartitions.BC.$chr.inversion.bootstrap.final > $dirraxml/$chr.inversion.RAxML.bootstrap.txt
-
 ```
 
 
