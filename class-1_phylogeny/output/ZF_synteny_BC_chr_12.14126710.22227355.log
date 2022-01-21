@@ -1,0 +1,52 @@
+PLINK v1.90b4 64-bit (20 Mar 2017)
+Options in effect:
+  --allow-extra-chr
+  --allow-no-sex
+  --double-id
+  --geno 0.9
+  --maf 0.001
+  --mind 0.2
+  --not-chr chr_Z
+  --out /home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355
+  --pca var-wts
+  --vcf /home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/input/ZF_synteny_BC_chr_12.14126710.22227355.vcf.gz
+
+Hostname: node02
+Working directory: /home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline
+Start time: Thu Jan 20 16:41:45 2022
+
+Random number seed: 1642693305
+515898 MB RAM detected; reserving 257949 MB for main workspace.
+--vcf:
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355-temporary.bed
++
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355-temporary.bim
++
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355-temporary.fam
+written.
+366552 variants loaded from .bim file.
+19 people (0 males, 0 females, 19 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355.nosex
+.
+0 people removed due to missing genotype data (--mind).
+Using up to 31 threads (change this with --threads).
+Before main variant filters, 19 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.999111.
+0 variants removed due to missing genotype data (--geno).
+0 variants removed due to minor allele threshold(s)
+(--maf/--max-maf/--mac/--max-mac).
+366552 variants and 19 people pass filters and QC.
+Note: No phenotypes present.
+Relationship matrix calculation complete.
+Warning: calculating 19 PCs, since there are only 19 samples.
+--pca: Results saved to
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355.eigenval
+,
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355.eigenvec
+, and
+/home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline/class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355.eigenvec.var
+.
+
+End time: Thu Jan 20 16:42:01 2022

@@ -4,4 +4,11 @@ PCA/input/vcf/*
 class-1/input/vcf/*
 slim/msmc2-decode/output/*
 !slim/msmc2-decode/output/model_id_gen_tmrca.txt
+class-1_phylogeny/input/*.vcf.gz
+class-1_phylogeny/input/*.vcf.gz.csi
+class-1_phylogeny/input/*fa
+class-1_phylogeny/output/alignment/*
+class-1_phylogeny/output/raxml/*
+!class-1_phylogeny/output/raxml/*.png
+!class-1_phylogeny/output/raxml/*.txt
 

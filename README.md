@@ -1109,10 +1109,426 @@ Blackcap class-1 genomic islands on chromosomes 28 and 30 are syntenic to zebra 
 
 
 
+
+
+
 ## Phylogenetics of inversion
 
-Next, using blackcap chromosome 12 and zebra finch chromosome 11 as an example
+Here I demonstrate how phygenetic tree was constructed at class-1 genomic islands, using blackcap chromosome 12 as an example.
 
+```bash
+dirbase=$PWD/class-1_phylogeny
+dirlist=$dirbase/list
+dirin=$dirbase/input
+dirout=$dirbase/output
+        dircons=$dirout/consensus
+        diraln=$dirout/alignment
+        dirraxml=$dirout/raxml
+dirscripts=$dirbase/scripts
+
+
+```
+
+### Genotype zebra finches 
+
+First, download SNPs data of zebra finches, from <https://datadryad.org/stash/downloads/file_stream/1098>.
+This is the data set created and analysed in [Singhal et al., 2016](https://www.science.org/doi/10.1126/science.aad0843).
+The zebra finch VCF file is `gatk.ug.zf.all_chrs.masked.filtered.vqsr2.vcf.gz` (not included in this repo).
+
+Subset the zebra finch VCF only syntenic genomic regions to blackcap class-1 genomic island on chromosome 12 (zebra finch chromosome 11) and non-captive individuals (listed in [`class-1_phylogeny/list/ZF.non.captive.list`](class-1_phylogeny/list/ZF.non.captive.list)).
+Note that precomputed file is [`class-1_phylogeny/input/ZF_synteny_BC_chr_12.14126710.22227355.vcf.gz`](class-1_phylogeny/input/ZF_synteny_BC_chr_12.14126710.22227355.vcf.gz)
+
+```bash
+
+bcftools view -R $dirlist/ZF_synteny_BC_chr_12.14126710.22227355.bed -S $dirlist/ZF.non.captive.list -m2 -M2 $dirin/gatk.ug.zf.all_chrs.masked.filtered.vqsr2.vcf.gz | vcftools --vcf - --mac 1 --recode --recode-INFO-all  -c | bgzip > $dirpcavcf/ZF_synteny_BC_$chr.$pos1.$pos2.vcf.gz 
+
+```
+
+
+Then run PCA with `PLINK`.
+Check [`class-1_phylogeny/scripts/plink_pca.sh`](class-1_phylogeny/scripts/plink_pca.sh) for detail.
+
+```bash
+
+sbatch $dirscripts/plink_pca.sh $dirin/ZF_synteny_BC_chr_12.14126710.22227355.vcf.gz $dirout/ZF_synteny_BC_chr_12.14126710.22227355
+
+```
+
+Plot the result.
+
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_ZF_PCA.R --dirout $dirout
+
+```
+![](class-1_phylogeny/output/ZF_synteny_BC_chr_12.14126710.22227355.PCA.png)
+
+Based on this result, make a list of zebra finch individuals with AA (samples with PC1 < -0.4) and BB (samples with PC1 > 0.1) genotype.
+
+
+```bash
+
+chr=chr_12
+pos1=14126710
+pos2=22227355
+
+awk '$3<-0.4{print $1}' $dirout/ZF_synteny_BC_$chr.$pos1.$pos2.eigenvec > $dirlist/ZF_synteny_BC_$chr.$pos1.$pos2.AA.list
+awk '$4<0.1{print $1}' $dirout/ZF_synteny_BC_$chr.$pos1.$pos2.eigenvec > $dirlist/ZF_synteny_BC_$chr.$pos1.$pos2.BB.list
+
+```
+
+### Consensus sequences of blackcap and zebra finch
+Next, make consensus sequences for A and B of blackcap and zebra finch.
+
+First, download zebra finch reference (TaeGut1 WUSTL 3.2.4) from <http://hgdownload.cse.ucsc.edu/goldenPath/taeGut1/bigZips/taeGut1.fa.gz>.
+We used this version of reference because we used the zebra finch VCF file to make consensus sequence, and the VCF is based on this reference version.
+Note that this reference is not included in this repo.
+
+<!--
+```bash
+rsync -avzP  rsync://hgdownload.cse.ucsc.edu/goldenPath/taeGut1/bigZips/taeGut1.fa.gz $dirzfref
+zcat $dirzfref/taeGut1.fa.gz > $dirin/Tgu.fa
+
+```
+-->
+
+
+Extract chr_12 from blackcap reference.
+```bash
+
+samtools faidx $dirin/bSylAtr1.1.fa chr11  > $dirin/BC.chr_12.fa
+
+```
+
+
+Extract chr11 from zebra finch reference.
+```bash
+
+samtools faidx $dirin/Tgu.fa chr11  > $dirin/ZF.chr11.fa
+
+```
+
+The precomputed files are [`class-1_phylogeny/input/BC.chr_12.fa`](class-1_phylogeny/input/BC.chr_12.fa) and [`class-1_phylogeny/input/ZF.chr11.fa`](class-1_phylogeny/input/ZF.chr11.fa).
+
+
+
+Link VCF of blackcap chromosome 12.
+
+```bash
+ln $dirbase/../class-1/input/vcf/chr_12.vcf.gz $dirin/BC_chr_12.vcf.gz
+ln $dirbase/../class-1/input/vcf/chr_12.vcf.gz.csi $dirin/BC_chr_12.vcf.gz.csi
+
+```
+
+Link list of samples with AA and BB samples of blackcap chr_12 inversion.
+
+```bash
+ln $dirbase/../class-1/list/chr_12.AA.list $dirlist/BC_chr_12.AA.list
+ln $dirbase/../class-1/list/chr_12.BB.list $dirlist/BC_chr_12.BB.list
+
+```
+
+
+Make lists of positions where consensus genotype is the alternative allele.
+For blackcap.
+```bash
+
+chr=chr_12
+#pos1=10390	
+#pos2=7293168
+
+for geno in AA BB
+do
+        echo $geno
+        bcftools view -m2 -M2 -v snps -S $dirlist/BC_chr_12.$geno.list -r $chr $dirin/BC_chr_12.vcf.gz | bcftools query -f '%CHROM %POS %REF %ALT[ %GT]\n'  | sed 's@/@ @g;s@|@ @g;s@\. @@g' | awk '{c=0;s=0;for(i=5;i<=NF;i++){c++;s+=$i};if(s>c/2){print $1,$2,$3,$4}}'> $dircons/BC.$chr.$geno.cons.swap.txt
+done
+
+```
+
+For zebra finch.
+```bash
+
+chr=chr11
+
+for geno in AA BB
+do
+        echo $geno
+        bcftools view -m2 -M2 -v snps -S $dirlist/ZF_synteny_BC_chr_12.14126710.22227355.$geno.list -r $chr $dirin/gatk.ug.zf.all_chrs.masked.filtered.vqsr2.vcf.gz | bcftools query -f '%CHROM %POS %REF %ALT[ %GT]\n'  | sed 's@/@ @g;s@|@ @g;s@\. @@g' | awk '{c=0;s=0;for(i=5;i<=NF;i++){c++;s+=$i};if(s>c/2){print $1,$2,$3,$4}}'> $dircons/ZF.$chr.$geno.cons.swap.txt
+done
+
+```
+
+
+
+
+Split these txt files by base (A, T, G, C) into bed files specifying which positions to swap to which base.
+
+```bash
+
+for sp in BC ZF
+do
+        if [ $sp == "BC" ]
+        then
+                chr=chr_12
+        else
+                chr=chr11
+        fi 
+        for geno in AA BB
+        do
+                for base in A T G C
+                do
+                        awk -v base=$base -v OFS="\t" '$4==base{print $1,$2-1,$2}' $dircons/$sp.$chr.$geno.cons.swap.txt > $dircons/$sp.$chr.$geno.cons.swap.to.$base.bed
+                done
+        done
+done
+
+
+```
+
+Using `BEDtools maskfasta`, swap the bases.
+```bash
+
+for sp in BC ZF
+do
+        if [ $sp == "BC" ]
+        then
+                chr=chr_12
+        else
+                chr=chr11
+        fi 
+        for geno in AA BB
+        do
+                cp $dirin/$sp.$chr.fa $dircons/tmp1.fa
+                for base in A T G C
+                do
+                        bedtools maskfasta -fi $dircons/tmp1.fa -bed $dircons/$sp.$chr.$geno.cons.swap.to.$base.bed -mc $base -fo $dircons/tmp2.fa
+                        mv $dircons/tmp2.fa $dircons/tmp1.fa
+                done
+                mv $dircons/tmp1.fa $dircons/$sp.$chr.$geno.cons.fa
+        done
+done
+
+```
+
+The created consensus sequences are in [`class-1_phylogeny/output/consensus`](class-1_phylogeny/output/consensus).
+
+
+### Map sequences to blackcap reference.
+
+First, download genome sequences of other species (garden warbler, Bengalese finch, and rifleman).
+
+Garden warbler from [VGP](https://vgp.github.io/genomeark-curated-assembly/Sylvia_borin/) (<https://s3.amazonaws.com/genomeark/species/Sylvia_borin/bSylBor1/assembly_curated/bSylBor1.pri.cur.20200424.fasta.gz>, gunzipped and renamed `SylBor.fa`. Not included in the repo).
+
+
+Bengalese finch from [GigaDB](http://gigadb.org/dataset/view/id/100398/File_page/2) (<ftp://parrot.genomics.cn/gigadb/pub/10.5524/100001_101000/100398/lonStrDom1.genome.fa>, renamed `LonStr.fa`. Not included in the repo).
+
+
+Rifleman from [VGP](https://vgp.github.io/genomeark/Acanthisitta_chloris/) (<https://s3.amazonaws.com/genomeark/species/Acanthisitta_chloris/bAcaChl1/assembly_curated/bAcaChl1.pri.cur.20191127.fasta.gz>, gunzipped and renamed `AcaChl.fa`. Not included in the repo).
+
+
+
+Next, map sequences using `minimap2`.
+
+Map blackcap consensus chromosome 12 to blackcap reference chromosome 12.
+```bash
+minimap2 -a $dirin/BC.chr_12.fa $dircons/BC.chr_12.AA.cons.fa > $diraln/BC.chr_12.AA.BC.chr_12.sam
+minimap2 -a $dirin/BC.chr_12.fa $dircons/BC.chr_12.BB.cons.fa > $diraln/BC.chr_12.BB.BC.chr_12.sam
+
+```
+
+Map zebra finch consensus chromosome 11 to blackcap reference chromosome 12.
+```bash
+minimap2 -a $dirin/BC.chr_12.fa $dircons/ZF.chr11.AA.cons.fa > $diraln/ZF.chr11.AA.BC.chr_12.sam
+minimap2 -a $dirin/BC.chr_12.fa $dircons/ZF.chr11.BB.cons.fa > $diraln/ZF.chr11.BB.BC.chr_12.sam
+
+```
+
+Map garden warbler whole genome to blackcap whole genome and extract chromosome 12.
+```bash
+
+minimap2 -a $dirin/bSylAtr1.1.fa $dirin/SylBor.fa  > $diraln/SylBor.BC.wholegenome.sam  
+samtools sort $diraln/SylBor.BC.wholegenome.sam  > $diraln/SylBor.BC.wholegenome.bam 
+samtools index $diraln/SylBor.BC.wholegenome.bam
+samtools view -h $diraln/SylBor.BC.wholegenome.bam  chr_12 > $diraln/SylBor.BC.chr_12.sam 
+
+```
+
+Map Bengalese finch whole genome to blackcap whole genome and extract chromosome 12.
+```bash
+
+minimap2 -a $dirin/bSylAtr1.1.fa $dirin/LonStr.fa  > $diraln/LonStr.BC.wholegenome.sam  
+samtools sort $diraln/LonStr.BC.wholegenome.sam  > $diraln/LonStr.BC.wholegenome.bam 
+samtools index $diraln/LonStr.BC.wholegenome.bam
+samtools view -h $diraln/LonStr.BC.wholegenome.bam  chr_12 > $diraln/LonStr.BC.chr_12.sam 
+
+```
+
+Map rifleman whole genome to blackcap whole genome and extract chromosome 12.
+```bash
+
+minimap2 -a $dirin/bSylAtr1.1.fa $dirin/AcaChl.fa  > $diraln/AcaChl.BC.wholegenome.sam  
+samtools sort $diraln/AcaChl.BC.wholegenome.sam  > $diraln/AcaChl.BC.wholegenome.bam 
+samtools index $diraln/AcaChl.BC.wholegenome.bam
+samtools view -h $diraln/AcaChl.BC.wholegenome.bam chr_12 > $diraln/AcaChl.BC.chr_12.sam 
+
+```
+
+
+Sort alignments.
+```bash
+
+for prefix in BC.chr_12.AA BC.chr_12.BB ZF.chr11.AA ZF.chr11.BB SylBor LonStr AcaChl
+do
+        samtools sort $diraln/$prefix.BC.chr_12.sam  > $diraln/$prefix.BC.chr_12.sorted.bam
+done
+
+```
+
+
+Make VCF and then convert to FASTA.
+
+```bash
+
+for prefix in BC.chr_12.AA BC.chr_12.BB ZF.chr11.AA ZF.chr11.BB SylBor LonStr AcaChl
+do
+        echo $prefix
+        bcftools mpileup -f $dirin/BC.chr_12.fa $diraln/$prefix.BC.chr_12.sorted.bam | bcftools call -c | bcftools view -v snps | bgzip > $diraln/$prefix.BC.chr_12.cons.vcf.gz
+        bcftools index $diraln/$prefix.BC.chr_12.cons.vcf.gz
+        bcftools consensus -s $diraln/$prefix.BC.chr_12.sorted.bam -f $dirin/BC.chr_12.fa $diraln/$prefix.BC.chr_12.cons.vcf.gz > $diraln/$prefix.BC.chr_12.fa
+        samtools faidx $diraln/$prefix.BC.chr_12.fa
+done
+
+```
+
+Make BED file specifying regions to exclude (DP!=1 in the alignment).
+```bash
+
+for prefix in BC.chr_12.AA BC.chr_12.BB ZF.chr11.AA ZF.chr11.BB SylBor LonStr AcaChl
+do
+        samtools depth $diraln/$prefix.BC.chr_12.sorted.bam | awk -v OFS="\t" '$3!=1{print $1,$2-1,$2}' > $diraln/$prefix.BC.chr_12.exclude.bed
+done
+
+
+```
+
+
+Concatenate the BED files and sort, and merge them into a single BED file.
+This step ensures that sites used for phylogenetic analysis are properly mapped to reference in all species.
+
+```bash
+
+for prefix in BC.chr_12.AA BC.chr_12.BB ZF.chr11.AA ZF.chr11.BB SylBor LonStr AcaChl
+do
+        cat $diraln/$prefix.BC.chr_12.exclude.bed
+done | bedtools sort | bedtools merge > $diraln/mask.bed
+
+
+```
+
+Mask the fasta files.
+```bash
+
+for prefix in BC.chr_12.AA BC.chr_12.BB ZF.chr11.AA ZF.chr11.BB SylBor LonStr AcaChl
+do
+        bedtools maskfasta -fi $diraln/$prefix.BC.chr_12.fa -bed $diraln/mask.bed -fo $diraln/$prefix.BC.chr_12.masked.fa
+done
+
+```
+
+
+Split the FASTA files into two: chromosomal background and inversion.
+```bash
+
+chr=chr_12
+pos1=14126710
+pos2=22227355
+spp=BC
+
+bgpos1=1
+bgpos2=13000000
+
+for prefix in BC.chr_12.AA BC.chr_12.BB ZF.chr11.AA ZF.chr11.BB SylBor LonStr AcaChl
+do
+        echo $prefix
+        samtools faidx $diraln/$prefix.$spp.$chr.masked.fa $chr:$pos1-$pos2 > $diraln/$prefix.$spp.$chr.masked.inversion.fa
+        samtools faidx $diraln/$prefix.$spp.$chr.masked.inversion.fa 
+        samtools faidx $diraln/$prefix.$spp.$chr.masked.fa $chr:$bgpos1-$bgpos2 > $diraln/$prefix.$spp.$chr.masked.background.fa
+        samtools faidx $diraln/$prefix.$spp.$chr.masked.background.fa 
+done
+
+
+```
+
+Concatenate all species.
+
+```bash
+
+for int in inversion background
+do
+        echo $chr $int
+        for prefix in BC.chr_12.AA BC.chr_12.BB ZF.chr11.AA ZF.chr11.BB SylBor LonStr AcaChl
+        do
+                awk -v prefix=$prefix 'BEGIN{print ">"prefix}NR>1{print $0}' $diraln/$prefix.$spp.$chr.masked.$int.fa
+        done > $diraln/$chr.all.aligned.masked.$int.fa
+done
+
+```
+These are the aligned FASTA to use for phylogenetic analysis.
+
+
+
+### Run RAxML
+
+
+Run RAxML for 1000 times and pick the best tree by ML (takes some time...).
+
+```bash
+cd $dirraxml
+chr=chr_12
+
+for region in inversion background
+do
+        raxmlHPC-AVX -s $diraln/$chr.all.aligned.masked.$region.fa -o AcaChl -N 1000  -p 12345 -m GTRGAMMA -n BC.$chr.$region
+done
+
+
+```
+
+Run RAxML for bootstrapping.
+
+```bash
+
+cd $dirraxml
+chr=chr_12
+
+for region in inversion background
+do
+        raxmlHPC-AVX -s $diraln/$chr.all.aligned.masked.$region.fa -o AcaChl -b 12345 -N 1000  -p 12345 -m GTRGAMMA -n BC.$chr.$region.bootstrap.txt
+done
+
+for region in inversion background
+do
+        raxmlHPC-AVX -s $diraln/$chr.all.aligned.masked.fa -o AcaChl -f b -t RAxML_bestTree.BC.$chr.$region -z RAxML_bootstrap.BC.$chr.$region.bootstrap -p 12345 -m GTRGAMMA -n BC.$chr.$region.bootstrap.final
+done
+
+
+# Edited the leaf names
+        #sed 's/SylBor/Garden_warbler/;s/ZF./Zebra_finch/;s/LonStr/Bengalese_finch/;s/BC./Blackcap/;s/AA//g;s/AcaChl/Rifleman/;s/$chr//g' $dirraxml/RAxML_bipartitions.BC.$chr.background.bootstrap.final > $dirraxml/$chr.background.RAxML.bootstrap.txt
+        #sed 's/SylBor/Garden_warbler/;s/ZF.AA/Zebra_finch_haplotype_A/;s/ZF.BB/Zebra_finch_haplotype_B/;s/LonStr/Bengalese_finch/;s/BC.AA/Blackcap_haplotype_A/;s/BC.BB/Blackcap_haplotype_B/;s/AcaChl/Rifleman/' $dirraxml/RAxML_bipartitions.BC.$chr.inversion.bootstrap.final > $dirraxml/$chr.inversion.RAxML.bootstrap.txt
+
+```
+
+
+
+Plot the tree.
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_phylo.chr_12.R --dirout $dirraxml
+
+
+```
+
+![](class-1_phylogeny/output/raxml/chr_12.raxml.png)
 
 
 
