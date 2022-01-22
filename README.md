@@ -1320,7 +1320,7 @@ First, download genome sequences of other species (garden warbler, Bengalese fin
 Garden warbler from [VGP](https://vgp.github.io/genomeark-curated-assembly/Sylvia_borin/) (<https://s3.amazonaws.com/genomeark/species/Sylvia_borin/bSylBor1/assembly_curated/bSylBor1.pri.cur.20200424.fasta.gz>, gunzipped and renamed `SylBor.fa`. Not included in the repo).
 
 
-Bengalese finch from [GigaDB](http://gigadb.org/dataset/view/id/100398/File_page/2) (<https://parrot.genomics.cn/gigadb/pub/10.5524/100001_101000/100398/lonStrDom1.genome.fa>, renamed `LonStr.fa`. Not included in the repo).
+Bengalese finch from [GigaDB](http://gigadb.org/dataset/view/id/100398/File_page/2) (<https://ftp.cngb.org/pub/gigadb/pub/10.5524/100001_101000/100398/lonStrDom1.genome.fa>, renamed `LonStr.fa`. Not included in the repo).
 
 
 Rifleman from [VGP](https://vgp.github.io/genomeark/Acanthisitta_chloris/) (<https://s3.amazonaws.com/genomeark/species/Acanthisitta_chloris/bAcaChl1/assembly_curated/bAcaChl1.pri.cur.20191127.fasta.gz>, gunzipped and renamed `AcaChl.fa`. Not included in the repo).
