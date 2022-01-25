@@ -12,3 +12,4 @@ class-1_phylogeny/output/raxml/*
 !class-1_phylogeny/output/raxml/*.png
 !class-1_phylogeny/output/raxml/*.txt
 class-1_phylogeny/*eigenvec.var
+class-2_popgen/input/*

@@ -1533,22 +1533,64 @@ Rscript $dirscripts/plot_phylo.chr_12.R --dirout $dirraxml
 
 
 ```bash
-dirbase=$PWD/class-2
-dirbase=$PWD/class-1_phylogeny
+dirbase=$PWD/class-2_popgen
 dirlist=$dirbase/list
 dirin=$dirbase/input
 dirout=$dirbase/output
-        dircons=$dirout/consensus
-        diraln=$dirout/alignment
-        dirraxml=$dirout/raxml
 dirscripts=$dirbase/scripts
 
 
 
 ```
 
+Link VCF of chromosome 21.
+
+```bash
+ln local_PCA/input/vcf/chr_21.vcf.gz $dirin
+
+```
+
+Tabix the VCF.
+```bash
+tabix $dirin/chr_21.vcf.gz
+
+```
 
 
+Make [`IDpoplist`](class-2_popgen/list/IDpoplist) in which sample ID and populations are written for focal populations (Azores, Cape Verde, Canary, Spain_Caz, and Belgium).
+
+First, copy list of all sample info.
+```bash
+cp PCA/list/id_spp_pop_site_pheno.tsv $dirlist
+
+```
+
+Make `<pop>.list` from `id_spp_pop_site_pheno.tsv`.
+```bash
+
+awk 'NR==1{print $0}{if($2=="Blackcap"){print $0}}' $dirlist/id_spp_pop_site_pheno.tsv > $dirlist/blackcap_id_spp_pop_site_pheno.list
+
+for pop in Azores CapeVerde Canary Spain_Caz Belgium 
+do
+        awk -v pop=$pop '$3==pop {print $1}' $dirlist/id_spp_pop_site_pheno.tsv > $dirlist/$pop.list
+done
+
+```
+
+Make `IDpop.list`.
+```bash
+
+echo sample population>$dirlist/IDpop.list
+for pop in Azores CapeVerde Canary Spain_Caz Belgium
+do
+        awk -v pop=$pop '{print $1,pop}' $dirlist/$pop.list
+done>>$dirlist/IDpop.list
+
+```
+
+
+Run PopGenome script to calculate FST, dXY, and pi in 10 kb sliding windows.
+Check [`class-2_popgen/scripts/PopGenome_windowstats.R`](class-2_popgen/scripts/PopGenome_windowstats.R) and [`class-2_popgen/scripts/PopGenome_windowstats.sh`](class-2_popgen/scripts/PopGenome_windowstats.sh) for detail.
 
 ```bash
 chr=chr_21
@@ -1559,6 +1601,25 @@ $dirlist/chromosomes_length.list \
 $chr \
 $dirlist/IDpop.list \
 $win \
-$dirout/blackcap.$chr
+$dirout/blackcap.$chr \
+$dirscripts
+
 
 ```
+
+Copy BED file of local PCA results.
+```bash
+cp local_PCA/output/local_PCA_MDS/local_PCA_MDS_outlier.bed $dirlist
+
+```
+
+Plot the result
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_windowstats_chr_21.R --dirout $dirout --dirlist $dirlist
+
+```
+
+
+
+
