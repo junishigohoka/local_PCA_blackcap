@@ -1,7 +1,7 @@
 local_PCA/input/vcf/*
 local_PCA/input/table/*
 PCA/input/vcf/*
-class-1/input/vcf/*
+class-1_popgen/input/vcf/*
 slim/msmc2-decode/output/*
 !slim/msmc2-decode/output/model_id_gen_tmrca.txt
 class-1_phylogeny/input/*.vcf.gz
