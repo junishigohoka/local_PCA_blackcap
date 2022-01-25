@@ -1620,6 +1620,6 @@ Rscript $dirscripts/plot_windowstats_chr_21.R --dirout $dirout --dirlist $dirlis
 
 ```
 
-
+![](class-2_popgen/output/chr_21.windowstats.png)
 
 
