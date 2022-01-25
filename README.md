@@ -1643,4 +1643,118 @@ Rscript $dirscripts/plot_class2_rec.R --dirlist $dirlist --dirout $dirout
 
 ![](class-2_popgen/output/class2_rec.png)
 
+## Class-3 genomic islands (tandem repeats)
+
+```bash
+dirbase=$PWD/class-3_repeats
+dirout=$dirbase/output
+dirlist=$dirbase/list
+dirscripts=$dirbase/scripts
+
+
+```
+
+[`TandemRepeatsFinder`](https://tandem.bu.edu/trf/trf.html) was run on the blackcap reference.
+The command was
+
+```bash
+trf bSylAtr1.1.fasta 2 7 7 80 10 50 2000 -f -d -m -h
+
+```
+
+where `bSylAtr1.1.fasta` is chromosome-renamed reference of blackcap (not included in the repo).
+
+The precomputed output is [`class-3_repeats/output/bSylAtr1.1.fasta.2.7.7.80.10.50.500.dat`](bSylAtr1.1.fasta.2.7.7.80.10.50.500.dat)
+
+
+Extract info from `bSylAtr1.1.fasta.2.7.7.80.10.50.500.dat` and take only repeats with unit length >=10 and number of tandem repeats>10.
+```bash
+
+awk -v OFS="\t" 'BEGIN{chr=NA;NRchr=0}$0~"Sequence"{chr=$2;NRchr=$2}{if(NR-NRchr>7&&$0!~"Sequence"&&$0!~"Parameters"&&length($0)>0&&$3>=10&&$4>10)print chr,$1,$2,$3,$4,$14}' $dirout/bSylAtr1.1.fasta.2.7.7.80.10.50.500.dat > $dirout/bSylAtr1.1.filtered.TRs.tsv
+
+```
+
+
+The format is...
+```bash
+head $dirout/bSylAtr1.1.filtered.TRs.tsv
+```
+```
+chr_1   1660    2827    21      57.7    TCTCGGCACTCCCCCGGCATC
+chr_1   11328   11441   11      10.4    AAATTCAGCCC
+chr_1   76151   76477   13      22.7    CGATGGCCCATTC
+chr_1   76164   76519   31      12.1    CGATGGCCCATTCCGATGGCCCGGCCCGCAG
+chr_1   77885   77987   10      10.4    GGGACACGGC
+chr_1   164577  164945  19      20.2    CACACTGCACAGCACTGCC
+chr_1   164596  164975  35      10.5    CACACTGCACTGCACTGCCCACAGCACACAGGGAG
+chr_1   164568  165167  54      11.4    CACAGGGAGCACACTGCACAGCACTGCCCACACTGCACAGCACTGCCCACAGCA
+chr_1   239910  240631  19      37.9    CACTGCAGCCCGGGGGTCT
+chr_1   257835  258369  20      26.8    ACCCCAGGACCACGGTGTGC
+```
+1st column: chromosome  
+2nd column: start position of TR  
+3rd column: end position of TR  
+4th column: length of repeat unit  
+5th column: number of tandem repeats  
+6th column: consensus sequence of TR unit  
+
+
+Summarise the data for visualisation.
+```bash
+cd $dirscripts
+while read chr len
+do
+        sbatch $dirscripts/summariseTRs.sh $chr $dirout $dirlist
+done<$dirlist/chromosomes_length.list
+
+
+```
+
+
+
+Concatenate the summary.
+```bash
+awk 'NR==1||FNR>1{print $0}' $dirout/bSylAtr1.1.filtered.TRs.summary.chr*.txt > $dirout/bSylAtr1.1.filtered.TRs.summary.wholegenome.txt
+
+```
+
+Plot the results.
+```bash
+module load R/3.5.3
+Rscript $dirscripts/plot_TRs_heatmap.R --dirout $dirout  --dirlist $dirlist
+
+```
+![](class-3_repeats/output/bSylAtr1.1.TR.heatmap.png)
+
+
+Then, for each chromosome, count the number of repeats by monomer sequence, and list the top 6 longest.
+```bash
+
+while read chr len
+do
+        awk -v chr=$chr '$1==chr{print $0}' $dirout/bSylAtr1.1.filtered.TRs.tsv | sort -k6 \
+        | awk 'NR==1{seq=$6;nrep=$5}{if($6==seq){nrep+=$5}else{print $1,nrep,length(seq),seq;seq=$6;nrep=$5}}END{print $1,nrep,length(seq),seq}' | sort -k3gr | head -n6
+done<$dirlist/chromosomes_length.list > $dirout/bSylAtr1.1.filtered.uniqTRs.top6.per.chr.txt
+
+```
+
+Extract these top 6 TRs for each chromosome.
+
+```bash
+
+while read chr nrep lrep seq
+do
+        awk -v chr=$chr -v seq=$seq '$1==chr&&$6==seq{print $0}' $dirout/bSylAtr1.1.filtered.TRs.tsv
+done<$dirout/bSylAtr1.1.filtered.uniqTRs.top6.per.chr.txt  > $dirout/bSylAtr1.1.filtered.uniqTRs.top6.unmerged.per.chr.txt
+
+```
+
+Plot the results.
+```bash
+Rscript $dirscripts/plot_TRs_top6.R --dirout $dirout --dirlist $dirlist
+
+```
+![](class-3_repeats/output/bSylAtr1.1.TR.top6.png)
+
+
 
