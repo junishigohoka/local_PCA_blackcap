@@ -207,13 +207,13 @@ Rscript $dirscripts/plot_eigenval.R --dirpca $dirout
 
 
 
-## Population genomics of class-1 genomic islands (empirical)
+## Population genetics of class-1 genomic islands (empirical)
 
 Here I demonstrate how population genomic analyses were performed on class-1 genomic islands, using chromosome 12 as an example.
 
 ```bash
 
-dirbase=$PWD/class-1
+dirbase=$PWD/class-1_popgen
 dirin=$dirbase/input
 dirvcf=$dirin/vcf
 dirmask=$dirin/mask
@@ -279,7 +279,7 @@ Rscript $dirscripts/plot_het.R --dir $dirout
 
 ```
 
-![](class-1/output/chr_12.het.png)
+![](class-1_popgen/output/chr_12.het.png)
 
 ### F<sub>ST</sub>, d<sub>XY</sub> and π
 
@@ -291,7 +291,7 @@ cp $dirbase/../local_PCA/list/chromosomes_length.list $dirlist
 ```
 
 
-Make [`chr_12_IDgeno.list`](class-1/list/chr_12_IDgeno.list).
+Make [`chr_12_IDgeno.list`](class-1_popgen/list/chr_12_IDgeno.list).
 
 ```bash
 
@@ -313,8 +313,8 @@ tabix $dirvcf/chr_12.vcf.gz
 
 
 Run PopGenome.
-[`class-1/scripts/PopGenome_windowstats.sh`](class-1/scripts/PopGenome_windowstats.sh) submits [`class-1/scripts/PopGenome_windowstats.R`](class-1/scripts/PopGenome_windowstats.R via slurm).
-Check [`class-1/scripts/PopGenome_windowstats.sh`](class-1/scripts/PopGenome_windowstats.sh) and [`class-1/scripts/PopGenome_windowstats.R`](class-1/scripts/PopGenome_windowstats.R) for detail.
+[`class-1_popgen/scripts/PopGenome_windowstats.sh`](class-1_popgen/scripts/PopGenome_windowstats.sh) submits [`class-1_popgen/scripts/PopGenome_windowstats.R`](class-1_popgen/scripts/PopGenome_windowstats.R via slurm).
+Check [`class-1_popgen/scripts/PopGenome_windowstats.sh`](class-1_popgen/scripts/PopGenome_windowstats.sh) and [`class-1_popgen/scripts/PopGenome_windowstats.R`](class-1_popgen/scripts/PopGenome_windowstats.R) for detail.
 
 ```bash
 
@@ -341,7 +341,7 @@ Rscript $dirscripts/plot_windowstats_class-1.R --dir $dirout --bedfile $dirlist/
 
 ```
 
-![](class-1/output/chr_12.class-1.windowstats.png)
+![](class-1_popgen/output/chr_12.class-1.windowstats.png)
 
 
 Run permutation tests.
@@ -357,18 +357,18 @@ done<$dirlist/class-1.chr_12.bed | awk 'BEGIN{print "chr","pos.from","pos.to","p
 
 ```
 
-The result is written in [`class-1/output/permutation_windowstats_class1.csv`](class-1/output/permutation_windowstats_class1.csv).
+The result is written in [`class-1_popgen/output/permutation_windowstats_class1.csv`](class-1_popgen/output/permutation_windowstats_class1.csv).
 
 
 
 
 ### Coalescent time (empirical)
 
-Samples used for coalescent time analysis are listed in [`class-1/list/chr_12.AA.4samples.list`](class-1/list/chr_12.AA.4samples.list), [`class-1/list/chr_12.AB.4samples.list`](class-1/list/chr_12.AB.4samples.list) and [`class-1/list/chr_12.BB.4samples.list`](class-1/list/chr_12.BB.4samples.list).
+Samples used for coalescent time analysis are listed in [`class-1_popgen/list/chr_12.AA.4samples.list`](class-1_popgen/list/chr_12.AA.4samples.list), [`class-1_popgen/list/chr_12.AB.4samples.list`](class-1_popgen/list/chr_12.AB.4samples.list) and [`class-1_popgen/list/chr_12.BB.4samples.list`](class-1_popgen/list/chr_12.BB.4samples.list).
 
 
 Mask files were created using `generate_multihetsep.py` following <https://github.com/stschiff/msmc-tools> from alignment files (BAM) and reference file (FASTA).
-Precomputed mask files are found in [`class-1/input/mask/`](class-1/input/mask/).
+Precomputed mask files are found in [`class-1_popgen/input/mask/`](class-1_popgen/input/mask/).
 
 
 Split VCF file into individuals.
@@ -387,7 +387,7 @@ done
 ```
 
 
-Make `run_generate_multihetsep_chr_12.<genotype>.sh` files in [`class-1/scripts/run_generate_multihetsep/`](class-1/scripts/run_generate_multihetsep/).
+Make `run_generate_multihetsep_chr_12.<genotype>.sh` files in [`class-1_popgen/scripts/run_generate_multihetsep/`](class-1_popgen/scripts/run_generate_multihetsep/).
 
 ```bash
 $dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
@@ -395,7 +395,7 @@ $dirscripts/write_run_generate_multihetsep_per_group.sh $dirbase
 ```
 
 
-Submit them via slurm to make [multihetsep files](class-1/input/multihetsep/).
+Submit them via slurm to make [multihetsep files](class-1_popgen/input/multihetsep/).
 
 ```bash
 
@@ -454,16 +454,16 @@ Rscript $dirscripts/plot_tmrca.R --dirlist $dirlist --dirout $dirout
 
 ```
 
-![](class-1/output/chr_12.tmrca.png)
+![](class-1_popgen/output/chr_12.tmrca.png)
 
 
 
 ### Recombination rate (empirical)
 
 Recombination rate was inferred by Karen Bascón-Cardozo using [`pyrho`](https://github.com/popgenmethods/pyrho).
-Raw output of `Pyrho` are [`chr_12.AA.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.AA.maf10_biall_W50_p20.rmap), [`chr_12.AB.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.AB.maf10_biall_W50_p20.rmap), [`chr_12.BB.maf10_biall_W50_p20.rmap`](class-1/output/chr_12.BB.maf10_biall_W50_p20.rmap).
+Raw output of `Pyrho` are [`chr_12.AA.maf10_biall_W50_p20.rmap`](class-1_popgen/output/chr_12.AA.maf10_biall_W50_p20.rmap), [`chr_12.AB.maf10_biall_W50_p20.rmap`](class-1_popgen/output/chr_12.AB.maf10_biall_W50_p20.rmap), [`chr_12.BB.maf10_biall_W50_p20.rmap`](class-1_popgen/output/chr_12.BB.maf10_biall_W50_p20.rmap).
 
-Calculate 10-kb mean recombination rate using [`PyrhoWindowMean.R`](class-1/scripts/PyrhoWindowMean.R).
+Calculate 10-kb mean recombination rate using [`PyrhoWindowMean.R`](class-1_popgen/scripts/PyrhoWindowMean.R).
 
 ```bash
 chr=chr_12
@@ -477,7 +477,7 @@ done
 
 ```
 
-The mean recombination rates are found in [`class-1/output/`](class-1/output) named `chr_12.inv.<geno>_win.10kb_step.10kb.mean.rec.tab`.
+The mean recombination rates are found in [`class-1_popgen/output/`](class-1_popgen/output) named `chr_12.inv.<geno>_win.10kb_step.10kb.mean.rec.tab`.
 Summarise the output in one file.
 ```bash
 paste $dirout/chr_12.inv.AA_win.10kb_step.10kb.mean.rec.tab $dirout/chr_12.inv.AB_win.10kb_step.10kb.mean.rec.tab $dirout/chr_12.inv.BB_win.10kb_step.10kb.mean.rec.tab  | cut -f 1,2,3,4,5,6,12,18 | awk -v OFS="\t" '{if(NR==1){$6="AA";$7="AB";$8="BB"}print $0}' > $dirout/chr_12.rec.10kb.tab
@@ -485,14 +485,14 @@ paste $dirout/chr_12.inv.AA_win.10kb_step.10kb.mean.rec.tab $dirout/chr_12.inv.A
 
 ```
 
-Plot the results using [`plot_rec_class-1.R`](class-1/scripts/plot_rec_class-1.R)
+Plot the results using [`plot_rec_class-1.R`](class-1_popgen/scripts/plot_rec_class-1.R)
 
 ```bash
 Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 
 ```
 
-![](class-1/output/rec_rate_class-1.png)
+![](class-1_popgen/output/rec_rate_class-1.png)
 
 
 
@@ -1215,16 +1215,16 @@ The precomputed files are [`class-1_phylogeny/input/BC.chr_12.fa`](class-1_phylo
 Link VCF of blackcap chromosome 12.
 
 ```bash
-ln $dirbase/../class-1/input/vcf/chr_12.vcf.gz $dirin/BC_chr_12.vcf.gz
-ln $dirbase/../class-1/input/vcf/chr_12.vcf.gz.csi $dirin/BC_chr_12.vcf.gz.csi
+ln $dirbase/../class-1_popgen/input/vcf/chr_12.vcf.gz $dirin/BC_chr_12.vcf.gz
+ln $dirbase/../class-1_popgen/input/vcf/chr_12.vcf.gz.csi $dirin/BC_chr_12.vcf.gz.csi
 
 ```
 
 Link list of samples with AA and BB samples of blackcap chr_12 inversion.
 
 ```bash
-ln $dirbase/../class-1/list/chr_12.AA.list $dirlist/BC_chr_12.AA.list
-ln $dirbase/../class-1/list/chr_12.BB.list $dirlist/BC_chr_12.BB.list
+ln $dirbase/../class-1_popgen/list/chr_12.AA.list $dirlist/BC_chr_12.AA.list
+ln $dirbase/../class-1_popgen/list/chr_12.BB.list $dirlist/BC_chr_12.BB.list
 
 ```
 
@@ -1529,6 +1529,36 @@ Rscript $dirscripts/plot_phylo.chr_12.R --dirout $dirraxml
 
 
 
+## Population genetics at class-2 genomic island
+
+
+```bash
+dirbase=$PWD/class-2
+dirbase=$PWD/class-1_phylogeny
+dirlist=$dirbase/list
+dirin=$dirbase/input
+dirout=$dirbase/output
+        dircons=$dirout/consensus
+        diraln=$dirout/alignment
+        dirraxml=$dirout/raxml
+dirscripts=$dirbase/scripts
 
 
 
+```
+
+
+
+
+```bash
+chr=chr_21
+win=10000
+sbatch $dirscripts/PopGenome_windowstats.sh \
+$dirin/$chr.vcf.gz \
+$dirlist/chromosomes_length.list \
+$chr \
+$dirlist/IDpop.list \
+$win \
+$dirout/blackcap.$chr
+
+```
