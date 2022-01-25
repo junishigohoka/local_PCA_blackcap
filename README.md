@@ -1530,7 +1530,7 @@ Rscript $dirscripts/plot_phylo.chr_12.R --dirout $dirraxml
 
 
 ## Population genetics at class-2 genomic island
-
+### FST, dXY, and pi
 
 ```bash
 dirbase=$PWD/class-2_popgen
@@ -1538,8 +1538,6 @@ dirlist=$dirbase/list
 dirin=$dirbase/input
 dirout=$dirbase/output
 dirscripts=$dirbase/scripts
-
-
 
 ```
 
@@ -1621,5 +1619,28 @@ Rscript $dirscripts/plot_windowstats_chr_21.R --dirout $dirout --dirlist $dirlis
 ```
 
 ![](class-2_popgen/output/chr_21.windowstats.png)
+
+
+### Recombination rates
+
+Population-specific recombination rates along chromosome 21 of Azores, Cape Verde, continental med-long migrants (Belgium) and continental residents were inferred using `pyrho` by Karen Bascón-Cardozo.
+
+The `pyrho` output files are `class-2_popgen/output/chr_21_<pop>_n20_Pen20_W50.rmap`.
+10 kb window average was calculated with the same R script as in class-1.
+
+Summarise the results.
+```bash
+module load R/3.5.3
+
+Rscript $dirscripts/summarise_pop_rec_rate_comp_chr_21.R --dirout $dirout --dirlist $dirlist
+
+```
+Plot the results.
+```bash
+Rscript $dirscripts/plot_class2_rec.R --dirlist $dirlist --dirout $dirout
+
+```
+
+![](class-2_popgen/output/class2_rec.png)
 
 
