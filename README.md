@@ -1,8 +1,23 @@
 # Pipeline for "Recombination suppression and selection affect local ancestries in genomes of a migratory songbird"
 
+
+Jun Ishigohoka
+
+
+Here I describe the key analyses done in our study, [Ishigohoka et al. 2021](https://www.biorxiv.org/content/10.1101/2021.12.22.473882v1.full).
+
+Generally used software  
++ [`BCFtools`](http://www.htslib.org/doc/1.0/bcftools.html)
++ [`tabix`](http://www.htslib.org/doc/tabix.html)
++ [`VCFtools`](https://vcftools.github.io/)
+
+
 ## Local PCA
 
 Here I show how local PCA was run with three example chromosomes, 12, 20, and 21, which are listed in `local_PCA/list/chromosomes/list`
+
+Key software used
++ [`lostruct`](https://github.com/petrelharp/local_pca)
 
 ```bash
 dirbase=$PWD/local_PCA
@@ -20,7 +35,10 @@ dirscripts=$dirbase/scripts
 Download filtered VCF files for chromosomes 12, 20, 21.
 
 ```bash
-
+cd $dirvcf
+wget -O vcfs.tar.gz "https://ftp.evolbio.mpg.de/main.html?download&weblink=6e1a525bfb81af987e4ddde20c466d23&realfilename=vcfs.tar.gz"
+tar xvzf vcfs.tar.gz
+cd $dirbase/../
 
 ```
 
@@ -119,6 +137,12 @@ Rscript $dirscripts/plot_local_PCA_MDS_manhattan.R --input $dirlocalpcamds/local
 
 Here I show how PCA was run for three local PCA outlier regions of chromosomes 12, 20, and 21, which represent class-1, 2, and 3 outliers.
 
+
+Key software used  
++ [`PLINK` v.1.9](https://www.cog-genomics.org/plink/)
+
+
+
 ```bash
 dirbase=$PWD/PCA
 dirin=$dirbase/input
@@ -210,6 +234,15 @@ Rscript $dirscripts/plot_eigenval.R --dirpca $dirout
 ## Population genetics of class-1 genomic islands (empirical)
 
 Here I demonstrate how population genomic analyses were performed on class-1 genomic islands, using chromosome 12 as an example.
+
+Key software used   
++ [`PopGenome`](https://popgenome.weebly.com/) package of R.
++ [`generate_multihetsep.py`](https://github.com/stschiff/msmc-tools) from `MSMC-tools`.
++ [`decode`](https://github.com/stschiff/msmc2) compiled with `MSMC2`. Expalined in <https://github.com/stschiff/msmc/blob/master/guide.md#estimating-the-local-tmrca-states>.
++ [`pyrho`](https://github.com/popgenmethods/pyrho)
+
+
+
 
 ```bash
 
@@ -497,6 +530,16 @@ Rscript $dirscripts/plot_rec_class-1.R --dirlist $dirlist --dirout $dirout
 
 
 ## Class-1 genomic islands (simulation)
+
+Here I demonstrate how simulations were performed to investigate the performance of `MSMC2-decode` and `pyrho` at a polymorphic inversion.
+
+
+Key software used  
++ [`SLiM` v.3.5](https://messerlab.org/slim/)
++ [`pyrho`](https://github.com/popgenmethods/pyrho)
++ [`decode`](https://github.com/stschiff/msmc2) compiled with `MSMC2`. Expalined in <https://github.com/stschiff/msmc/blob/master/guide.md#estimating-the-local-tmrca-states>.
+
+
 
 ### Coalescent time
 
@@ -1043,7 +1086,15 @@ Rscript $dirscripts/plot_slim_pyrho.R --dirout $dirout
 
 
 ## Synteny analysis
-### Synteny between blackcap and zebra finch
+
+Here I demostrate how synteny analysis was performed between blackcap and zebra finch genomes.
+
+
+Key software used  
++ [`SatsumaSynteny`](http://satsuma.sourceforge.net/)
++ [`circlize`](https://jokergoo.github.io/circlize/) package of R.
+
+
 
 ```bash
 dirbase=$PWD/synteny
@@ -1115,6 +1166,14 @@ Blackcap class-1 genomic islands on chromosomes 28 and 30 are syntenic to zebra 
 ## Phylogenetics of inversion
 
 Here I demonstrate how phygenetic tree was constructed at class-1 genomic islands, using blackcap chromosome 12 as an example.
+
++ [`PLINK` v.1.9](https://www.cog-genomics.org/plink/)
++ [`SAMtools`](http://www.htslib.org/doc/samtools.html)
++ [`minimap2`](https://github.com/lh3/minimap2)
++ [`BEDTools`](https://bedtools.readthedocs.io/en/latest/content/bedtools-suite.html)
++ [`RAxML` v.8.2.9](https://github.com/stamatak/standard-RAxML)
++ [`ape`](http://ape-package.ird.fr/) package of R.
+
 
 ```bash
 dirbase=$PWD/class-1_phylogeny
@@ -1530,6 +1589,13 @@ Rscript $dirscripts/plot_phylo.chr_12.R --dirout $dirraxml
 
 
 ## Population genetics at class-2 genomic island
+
+Here I demonstrate how population genetic analyses were performed for class-2 genomic island.
+
+Key software used  
++ [`PopGenome`](https://popgenome.weebly.com/) package of R.
++ [`pyrho`](https://github.com/popgenmethods/pyrho)
+
 ### FST, dXY, and pi
 
 ```bash
@@ -1643,7 +1709,16 @@ Rscript $dirscripts/plot_class2_rec.R --dirlist $dirlist --dirout $dirout
 
 ![](class-2_popgen/output/class2_rec.png)
 
+
+
+
 ## Class-3 genomic islands (tandem repeats)
+
+Here I demonstrate how tandem repeat analysis was performed.
+
+Key software used  
++ [`TandemRepeatsFinder`](https://tandem.bu.edu/trf/trf.html)
+
 
 ```bash
 dirbase=$PWD/class-3_repeats

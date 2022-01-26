@@ -1,0 +1,12 @@
+PLINK v1.90b4 64-bit (20 Mar 2017)
+Options in effect:
+  --v
+
+Hostname: wallace
+Working directory: /home/ishigohoka/projects/Miriam/PhD/papers/paper1_localPCA/pipeline
+Start time: Wed Jan 26 16:42:02 2022
+
+Error: Unrecognized flag ('-v').
+For more information, try 'plink --help [flag name]' or 'plink --help | more'.
+
+End time: Wed Jan 26 16:42:02 2022
