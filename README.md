@@ -238,7 +238,7 @@ Here I demonstrate how population genomic analyses were performed on class-1 gen
 Key software used   
 + [`PopGenome`](https://popgenome.weebly.com/) package of R.
 + [`generate_multihetsep.py`](https://github.com/stschiff/msmc-tools) from `MSMC-tools`.
-+ [`decode`](https://github.com/stschiff/msmc2) compiled with `MSMC2`. Expalined in <https://github.com/stschiff/msmc/blob/master/guide.md#estimating-the-local-tmrca-states>.
++ [`decode`](https://github.com/stschiff/msmc2) compiled from source. Expalined in <https://github.com/stschiff/msmc/blob/master/guide.md#estimating-the-local-tmrca-states>.
 + [`pyrho`](https://github.com/popgenmethods/pyrho)
 
 
